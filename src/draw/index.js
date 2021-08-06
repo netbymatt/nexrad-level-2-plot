@@ -136,7 +136,12 @@ const draw = (data, _options) => {
 			ctx.stroke();
 		});
 	});
-	return canvas;
+
+	// return the palette and canvas
+	return {
+		canvas,
+		palette: palette.getPalette(),
+	};
 };
 
 module.exports = {

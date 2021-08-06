@@ -19,7 +19,7 @@ const file = fs.readFileSync('<path to data>');
 const level2Plot = plot(file, {elevation: 1, product: 'REF'});
 // use bundled utility to write to disk
 (async () => {
-	await writePngToFile('<path to output>.png', level2Plot.REF);
+	await writePngToFile('<path to output>.png', level2Plot.REF.canvas);
 })();
 ```
 # Data
@@ -47,13 +47,27 @@ Test code and data is provided in the `./demo` folder. `test.js` can be used to 
 # API
 
 ## plot(data, products, options)
-Returns a [Canvas](https://www.npmjs.com/package/canvas) object.
-> Note: May return false if no data was found for the specified elevation and product.
+Returns an object
+``` javascript
+	{
+		REF: {
+			canvas: <Canvas>,
+			palette: <Uint8ClampedArray>
+		},
+		//... additional products
+	}
+```
+The first level key in the returned object represents each requested product.
+> Note: Each product may return false if no data was found for the specified elevation and product.
+
+```[canvas](https://www.npmjs.com/package/canvas)``` contains the plotted data and functions for outputtting various image formats.
+
+```palette``` is an array that can be used to create palletized images from the canvas library.
 
 |Paramater|Type|Default|Description|
 |---|---|---|---|
 data|Level2Radar||Output from [nexrad-level-2-data](https://github.com/netbymatt/nexrad-level-2-data/).
-products|Array of strings|Individual strings as shown in supported products to specify the products to be plotted.
+products|Array of strings|All|Individual strings as shown in supported products to specify the products to be plotted.
 options.size|integer|1800|1 to 1800. Size of the x and y axis in pixels. The image must be square so only a single integer is needed. See [downsampling](#downsampling)
 options.background|string|#000000|Background color of the image. This can be transparent by using #RGBA notation. See [ctx.fillStyle](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle) for more information.
 options.lineWidth|integer|2|The raster image is created by drawing several arcs at the locations and colors specified in the data file. When scaling down you may get a better looking image by adjusting this value to something large than the default.
