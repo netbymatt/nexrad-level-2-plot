@@ -62,7 +62,7 @@ The first level key in the returned object represents each requested product.
 
 ```[canvas](https://www.npmjs.com/package/canvas)``` contains the plotted data and functions for outputtting various image formats.
 
-```palette``` is an array that can be used to create palletized images from the canvas library.
+```palette``` is an array that can be used to create palettized images from the canvas library.
 
 |Paramater|Type|Default|Description|
 |---|---|---|---|
@@ -71,7 +71,7 @@ products|Array of strings|All|Individual strings as shown in supported products 
 options.size|integer|1800|1 to 1800. Size of the x and y axis in pixels. The image must be square so only a single integer is needed. See [downsampling](#downsampling)
 options.background|string|#000000|Background color of the image. This can be transparent by using #RGBA notation. See [ctx.fillStyle](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle) for more information.
 options.lineWidth|integer|2|The raster image is created by drawing several arcs at the locations and colors specified in the data file. When scaling down you may get a better looking image by adjusting this value to something large than the default.
-options.palletize|boolean\|object|false|After drawing the image convert the image from RGBA to a palettized image. When true the same pallet as the product is used. Additional options are described in [palletizing](#palletizing). This can significantly reduce the size of the resulting image with minimal loss of clarity.
+options.palettize|boolean\|object|false|After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used. Additional options are described in [palettizing](#palettizing). This can significantly reduce the size of the resulting image with minimal loss of clarity.
 
 ### Downsampling
 A full size plot is 1800 x 1800 pixels. This corresponds to the maximum range of the radar ~250 mi * maximum resolution 0.25 mi/bin * 2 (east and west side of radar).
@@ -80,30 +80,30 @@ options.size < 1800 will internally scale the image to the selected size. The sc
 
 options.size > 1800 is invalid as this would cause data to be interpolated and would not be a true representation of the data returned by the radar. If you need this functionality it's recommended to use an image scaling package such as [jimp](https://www.npmjs.com/package/jimp) or [gm](https://www.npmjs.com/package/gm) on the Canvas returned by plot().
 
-### Palletizing
->If used with [plotAndData()](#plotanddatafile-options) both the original image and the palletized image will be returned if used with [plot()](#plotfile-options) only the palletized image will be returned.
+### Palettizing
+>If used with [plotAndData()](#plotanddatafile-options) both the original image and the palettized image will be returned if used with [plot()](#plotfile-options) only the palettized image will be returned.
 
-Plotting what is essentially polar data (raw radar data) to a cartesean coordinate system (raster image) causes some artifacts as the arcs drawn by the raster data do not align exactly with the grid of pixels in the raster image. The plotting algorithm approximates the arc by using colors between the pallet specificed color and background color to "partially" shade the pixels that are not fully consumed by the arc.
+Plotting what is essentially polar data (raw radar data) to a cartesean coordinate system (raster image) causes some artifacts as the arcs drawn by the raster data do not align exactly with the grid of pixels in the raster image. The plotting algorithm approximates the arc by using colors between the palette specificed color and background color to "partially" shade the pixels that are not fully consumed by the arc.
 
 This process makes use of the RGBA color space with either 3 or 4 bytes per pixel. From the standpoint of representing radar data in an image this is very inefficient use of space as typically 16 or 32 colors (> 1 byte) is necessary to show the data in it's original format. This RGBA image also does not lend itself well to PNG compression which is lossless.
 
-Palletizing introduces a compromise between image size and compresability. After the initial image is drawing the palletizing algorithm can then re-process the RGBA image and force all pixels to be one of the original color values specificed in the product's palette (options.palletize = true, the default). It can also generate an optimized pallet that uses a set number of steps between the colors in the palette and the background color with a maximum generated pallet size of 256 colors (options.palletize.generate = <steps>). Finally a custom palette can be provided in the form of [r1,g1,b1,r2,g2,b2,...] alpha values will be generated automatically.
+Palettizing introduces a compromise between image size and compresability. After the initial image is drawing the palettizing algorithm can then re-process the RGBA image and force all pixels to be one of the original color values specificed in the product's palette (options.palettize = true, the default). It can also generate an optimized palette that uses a set number of steps between the colors in the palette and the background color with a maximum generated palette size of 256 colors (options.palettize.generate = <steps>). Finally a custom palette can be provided in the form of [r1,g1,b1,r2,g2,b2,...] alpha values will be generated automatically.
 
-A look-up table is created and cached as part of the palletization process speeding up additional calls the the palletizing function. The cache is specific to the product and options provided.
+A look-up table is created and cached as part of the palettization process speeding up additional calls the the palettizing function. The cache is specific to the product and options provided.
 
-#### Palletization options (options.palletize.<parameter>)
+#### Palettization options (options.palettize.<parameter>)
 Parameter|Type|Default|Description
 |--|--|--|--|
 generate|integer|0|Generate a palette by creating a number of steps between the background color and each color provided the the product data. There is a hard limit of 256 colors in the palette due to the PNG specification. For example a 16-color original palette with generate = 4 would produce a palette of 64 colors (4 versions of each of the original 16 colors).
 palette|array|\<from product>|If not provided the palette provided by the palette is used. If use the array should be in the format [r1,g1,b1,a1,r2,g2,b2,a2,...]. The generate option will operate on this array if it is provided. Set generate to 0 to keep the provided palette from being altered.
 
-## writePngToFile(fileName, canvas)
+## writePngToFile(fileName, data)
 Returns a Promise which resolves to the written file name.
 Writes a PNG file to disk. Provided as a convenience function for production and testing.
 |Paramater|Type|Description|
 |---|---|---|
 fileName|string|A file name or path used by [fs.createWriteStream()](https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options).
-canvas|[Canvas](https://www.npmjs.com/package/canvas)|Typically the output of [plot()](#plotfile-options).
+data|{canvas[palette]}|Typically the output of [plot()](#plotfile-options).\<product type>.
 
 # Acknowledgements
 The code for this project is based upon:

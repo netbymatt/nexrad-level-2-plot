@@ -1,4 +1,4 @@
-const { draw } = require('./draw');
+const { draw, canvas } = require('./draw');
 const { writePngToFile } = require('./utils/file');
 
 const plot = (data, _products, options) => {
@@ -33,4 +33,5 @@ const plot = (data, _products, options) => {
 module.exports = {
 	plot,
 	writePngToFile,
+	canvas,
 };

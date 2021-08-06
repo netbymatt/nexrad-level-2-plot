@@ -1,5 +1,9 @@
-const { createCanvas } = require('canvas');
+const canvasObj = require('canvas');
+
+const { createCanvas } = canvasObj;
+
 const Palette = require('./palettes');
+const palettizeImage = require('./palettize');
 
 // names of data structures keyed to product name
 const dataNames = {
@@ -137,9 +141,19 @@ const draw = (data, _options) => {
 		});
 	});
 
+	if (!options.palettize) {
 	// return the palette and canvas
+		return {
+			canvas,
+		};
+	}
+
+	// palettize image
+	const palettized = palettizeImage(canvas.getContext('2d'), palette);
+
+	// return palettized image
 	return {
-		canvas,
+		canvas: palettized,
 		palette: palette.getPalette(),
 	};
 };
@@ -147,4 +161,5 @@ const draw = (data, _options) => {
 module.exports = {
 	draw,
 	DEFAULT_OPTIONS,
+	canvas: canvasObj,
 };

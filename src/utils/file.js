@@ -1,8 +1,8 @@
 const fs = require('fs');
 // write a canvas to a Png file
-const writePngToFile = (fileName, canvas) => new Promise((resolve, reject) => {
+const writePngToFile = (fileName, data) => new Promise((resolve, reject) => {
 	// the draw function will return false if no data was found, short circuit the output here
-	if (!canvas) {
+	if (!data.canvas) {
 		resolve();
 		return;
 	}
@@ -12,10 +12,10 @@ const writePngToFile = (fileName, canvas) => new Promise((resolve, reject) => {
 
 	// options
 	const options = {};
-	if (canvas.palette) options.palette = canvas.palette;
+	if (data.palette) options.palette = data.palette;
 
 	// write to the stream
-	canvas.createPNGStream(options).pipe(writeStream);
+	data.canvas.createPNGStream(options).pipe(writeStream);
 	writeStream.on('finish', () => resolve(fileName));
 	writeStream.on('error', (e) => reject(e));
 });

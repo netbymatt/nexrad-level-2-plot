@@ -2,5 +2,15 @@
 	"files.exclude": {
 		"node_modules/nexrad-level-2-data/**/node_modules": true,
 		"**/node_modules": true
-	}
+	},
+	"cSpell.words": [
+		"KLOT",
+		"NOAA",
+		"Palettized",
+		"RGBA",
+		"palettization",
+		"palettize",
+		"palletizing",
+		"uncommenting"
+	]
 }
