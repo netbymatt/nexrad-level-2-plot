@@ -53,9 +53,6 @@ const draw = (data, _options) => {
 	// calculate crop, adjust if necessary
 	const cropTo = Math.min(options.size, options.cropTo);
 	if (options.cropTo < 1) throw new Error('Provide options.cropTo > 0');
-	// calculate highest bin number to plot, diagonal distance from center of plot area to corner
-	// TODO improve plotting time by calculating the max bin for each azimuth
-	const cropMaxBin = Math.ceil((Math.sqrt(2) * (cropTo / 2)) * scale);
 
 	// create the canvas and context
 	const canvas = createCanvas(cropTo, cropTo);
@@ -115,7 +112,9 @@ const draw = (data, _options) => {
 		let downsampled = 0;
 		let lastRemainder = 0;
 
-		// calculate maximum bin to plot
+		// calculate maximum bin to plot based on azimuth
+		const azWrap = startAngle % (Math.PI / 2);
+		const cropMaxBin = Math.ceil(Math.abs(cropTo / Math.cos(azWrap)) - 50);
 		const maxBin = Math.min(cropMaxBin, thisRadial.moment_data.length);
 		// plot each bin
 		for (let idx = 0; idx < maxBin; idx += 1) {

@@ -6,8 +6,8 @@ const { plot, writePngToFile } = require('../src');
 
 // list files
 // const files = glob.sync('./data/KLOT/34/*');
-// const files = glob.sync('./data/KLOT/381/*');
-const files = glob.sync('./data/KLOT/548/*');
+const files = glob.sync('./data/KLOT/381/*');
+// const files = glob.sync('./data/KLOT/548/*');
 // const files = glob.sync('./data/KLOT/940/*');
 // const files = glob.sync('./data/KSRX/804/*');
 // const files = glob.sync('./data/TORD/767/*');
@@ -44,7 +44,5 @@ const plots = [];
 				writePngToFile(`./output/VEL-${elevation}-${size}.png`, plots[elevation].VEL),
 			]);
 		}));
-		console.log(plots);
-		console.log();
 	}));
 })();
