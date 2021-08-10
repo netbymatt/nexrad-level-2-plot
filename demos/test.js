@@ -29,12 +29,13 @@ const plots = [];
 
 // plot for each elevation and size
 (async () => {
-	await Promise.allSettled([1800, 900, 450, 100].map(async (size) => {
+	await Promise.allSettled([3600, 1800, 900, 450, 100].map(async (size) => {
 		await Promise.allSettled(radarData.listElevations().map(async (elevation) => {
 			plots[elevation] = plot(radarData, ['REF', 'VEL'], {
 				elevation,
 				size,
 				palettize: true,
+				cropTo: size / 2,
 			});
 
 			// write files to disk

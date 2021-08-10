@@ -68,17 +68,20 @@ The first level key in the returned object represents each requested product.
 |---|---|---|---|
 data|Level2Radar||Output from [nexrad-level-2-data](https://github.com/netbymatt/nexrad-level-2-data/).
 products|Array of strings|All|Individual strings as shown in supported products to specify the products to be plotted.
-options.size|integer|1800|1 to 1800. Size of the x and y axis in pixels. The image must be square so only a single integer is needed. See [downsampling](#downsampling)
+options.size|integer|3600|1 to 3600. Size of the x and y axis in pixels. The image must be square so only a single integer is needed. See [downsampling](#downsampling)
+options.cropTo|integer|3600|1 to 3600. After scaling and downsampling as described above crop the resulting plot to the size specified. Internally, the image is actually drawn at the cropped size to save on processing time.
 options.background|string|#000000|Background color of the image. This can be transparent by using #RGBA notation. See [ctx.fillStyle](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle) for more information.
 options.lineWidth|integer|2|The raster image is created by drawing several arcs at the locations and colors specified in the data file. When scaling down you may get a better looking image by adjusting this value to something large than the default.
 options.palettize|boolean\|object|false|After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used. Additional options are described in [palettizing](#palettizing). This can significantly reduce the size of the resulting image with minimal loss of clarity.
 
 ### Downsampling
-A full size plot is 1800 x 1800 pixels. This corresponds to the maximum range of the radar ~250 mi * maximum resolution 0.25 mi/bin * 2 (east and west side of radar).
+A full size plot is 3600 x 3600 pixels. This corresponds to the maximum range of the radar 460km (~250 mi) * maximum resolution 0.25 mi/bin * 2 (east and west side of radar).
 
-options.size < 1800 will internally scale the image to the selected size. The scaling algorithm is specific to radar data and returns the maximum value over the range of bins that are combined due to the scaling factor. This ensures that maximum reflectivity or maximum velocity are preserved during the scaling process. Using an image scaling package is not preferred in this case as the scaling algorithm used my mask important data.
+options.size < 3600 will internally scale the image to the selected size. The scaling algorithm is specific to radar data and returns the maximum value over the range of bins that are combined due to the scaling factor. This ensures that maximum reflectivity or maximum velocity are preserved during the scaling process. Using an image scaling package is not preferred in this case as the scaling algorithm used my mask important data.
 
-options.size > 1800 is invalid as this would cause data to be interpolated and would not be a true representation of the data returned by the radar. If you need this functionality it's recommended to use an image scaling package such as [jimp](https://www.npmjs.com/package/jimp) or [gm](https://www.npmjs.com/package/gm) on the Canvas returned by plot().
+options.size > 3600 is invalid as this would cause data to be interpolated and would not be a true representation of the data returned by the radar. If you need this functionality it's recommended to use an image scaling package such as [jimp](https://www.npmjs.com/package/jimp) or [gm](https://www.npmjs.com/package/gm) on the Canvas returned by plot().
+
+options.crop 
 
 ### Palettizing
 >If used with [plotAndData()](#plotanddatafile-options) both the original image and the palettized image will be returned if used with [plot()](#plotfile-options) only the palettized image will be returned.
@@ -91,7 +94,7 @@ Palettizing introduces a compromise between image size and compresability. After
 
 A look-up table is created and cached as part of the palettization process speeding up additional calls the the palettizing function. The cache is specific to the product and options provided.
 
-#### Palettization options (options.palettize.<parameter>)
+#### Palettization options (options.palettize.\<parameter>)
 Parameter|Type|Default|Description
 |--|--|--|--|
 generate|integer|0|Generate a palette by creating a number of steps between the background color and each color provided the the product data. There is a hard limit of 256 colors in the palette due to the PNG specification. For example a 16-color original palette with generate = 4 would produce a palette of 64 colors (4 versions of each of the original 16 colors).

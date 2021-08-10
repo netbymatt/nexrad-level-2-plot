@@ -32,7 +32,8 @@ const palettes = {
 // default options
 const DEFAULT_OPTIONS = {
 	// must be a square image
-	size: 1800,
+	size: 3600,
+	cropTo: 3600,
 	background: 'black',
 	lineWidth: 2,
 };
@@ -46,21 +47,28 @@ const draw = (data, _options) => {
 
 	// calculate scale
 	if (options.size > DEFAULT_OPTIONS.size) throw new Error(`Upsampling is not supported. Provide a size <= ${DEFAULT_OPTIONS.size}`);
-	if (options.size < 1) throw new Error('Provide a size > 0');
+	if (options.size < 1) throw new Error('Provide options.size > 0');
 	const scale = DEFAULT_OPTIONS.size / options.size;
 
+	// calculate crop, adjust if necessary
+	const cropTo = Math.min(options.size, options.cropTo);
+	if (options.cropTo < 1) throw new Error('Provide options.cropTo > 0');
+	// calculate highest bin number to plot, diagonal distance from center of plot area to corner
+	// TODO improve plotting time by calculating the max bin for each azimuth
+	const cropMaxBin = Math.ceil((Math.sqrt(2) * (cropTo / 2)) * scale);
+
 	// create the canvas and context
-	const canvas = createCanvas(options.size, options.size);
+	const canvas = createCanvas(cropTo, cropTo);
 	const ctx = canvas.getContext('2d');
 
 	// fill background with black
 	ctx.fillStyle = options.background;
-	ctx.fillRect(0, 0, options.size, options.size);
+	ctx.fillRect(0, 0, cropTo, cropTo);
 
 	// canvas settings
 	ctx.imageSmoothingEnabled = true;
 	ctx.lineWidth = options.lineWidth;
-	ctx.translate(options.size / 2, options.size / 2);
+	ctx.translate(cropTo / 2, cropTo / 2);
 	ctx.rotate(-Math.PI / 2);
 
 	// get the palette
@@ -107,38 +115,42 @@ const draw = (data, _options) => {
 		let downsampled = 0;
 		let lastRemainder = 0;
 
+		// calculate maximum bin to plot
+		const maxBin = Math.min(cropMaxBin, thisRadial.moment_data.length);
 		// plot each bin
-		thisRadial.moment_data.forEach((bin, idx) => {
+		for (let idx = 0; idx < maxBin; idx += 1) {
+			// get the value
+			const bin = thisRadial.moment_data[idx];
 			// skip null values
-			if (bin === null) return;
-
-			let thisSample;
-			// test for downsampling
-			if (scale !== 1) {
-				const remainder = idx % scale;
-				// test for rollover in scaling
-				if (remainder < lastRemainder) {
+			if (bin !== null) {
+				let thisSample;
+				// test for downsampling
+				if (scale !== 1) {
+					const remainder = idx % scale;
+					// test for rollover in scaling
+					if (remainder < lastRemainder) {
 					// plot this point and reset values
-					thisSample = downsampled;
-					downsampled = 0;
+						thisSample = downsampled;
+						downsampled = 0;
+					}
+
+					// store this sample if it meets downsample requirements
+					downsampled = palette.downSample(bin, downsampled);
+					// store for rollover tracking
+					lastRemainder = remainder;
+				} else {
+					thisSample = bin;
 				}
 
-				// store this sample if it meets downsample requirements
-				downsampled = palette.downSample(bin, downsampled);
-				// store for rollover tracking
-				lastRemainder = remainder;
-			} else {
-				thisSample = bin;
+				// see if there's a sample to plot
+				if (thisSample && !palette.inDeadband(thisSample)) {
+					ctx.beginPath();
+					ctx.strokeStyle = palette.findColorRgba(thisSample);
+					ctx.arc(0, 0, (idx + deadZone) / scale, startAngle, endAngle);
+					ctx.stroke();
+				}
 			}
-
-			// see if there's a sample to plot
-			if (!thisSample || palette.inDeadband(thisSample)) return;
-
-			ctx.beginPath();
-			ctx.strokeStyle = palette.findColorRgba(thisSample);
-			ctx.arc(0, 0, (idx + deadZone) / scale, startAngle, endAngle);
-			ctx.stroke();
-		});
+		}
 	});
 
 	if (!options.palettize) {
