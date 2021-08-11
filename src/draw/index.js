@@ -38,6 +38,10 @@ const DEFAULT_OPTIONS = {
 	lineWidth: 2,
 };
 
+// calculation constants
+const RAD45 = (45 * Math.PI / 180);
+const RAD90 = RAD45 * 2;
+
 const draw = (data, _options) => {
 	// combine options with defaults
 	const options = {
@@ -113,9 +117,15 @@ const draw = (data, _options) => {
 		let lastRemainder = 0;
 
 		// calculate maximum bin to plot based on azimuth
-		const azWrap = startAngle % (Math.PI / 2);
-		const cropMaxBin = Math.ceil(Math.abs(cropTo / Math.cos(azWrap)) - 50);
+		// wrap azimuth to 90° offset by -45° (% in js is remainder, the formula below make it in to modulus)
+		const azWrap = (((startAngle - RAD45) % RAD90) + RAD90) % RAD90;
+		// calculate a magnitude multiplier as 1/sin with 45° shift removed
+		const azMagnitudeMult = 1 / Math.abs(Math.sin(azWrap + RAD45));
+		const cropMaxBin = Math.ceil(Math.abs(options.cropTo / 2 * scale * azMagnitudeMult));
+
+		// compare max calculated value with length of radial
 		const maxBin = Math.min(cropMaxBin, thisRadial.moment_data.length);
+
 		// plot each bin
 		for (let idx = 0; idx < maxBin; idx += 1) {
 			// get the value

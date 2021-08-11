@@ -6,8 +6,8 @@ const { plot, writePngToFile } = require('../src');
 
 // list files
 // const files = glob.sync('./data/KLOT/34/*');
-const files = glob.sync('./data/KLOT/381/*');
-// const files = glob.sync('./data/KLOT/548/*');
+// const files = glob.sync('./data/KLOT/381/*');
+const files = glob.sync('./data/KLOT/548/*');
 // const files = glob.sync('./data/KLOT/940/*');
 // const files = glob.sync('./data/KSRX/804/*');
 // const files = glob.sync('./data/TORD/767/*');
@@ -29,20 +29,21 @@ const plots = [];
 
 // plot for each elevation and size
 (async () => {
-	await Promise.allSettled([3600, 1800, 900, 450, 100].map(async (size) => {
-		await Promise.allSettled(radarData.listElevations().map(async (elevation) => {
-			plots[elevation] = plot(radarData, ['REF', 'VEL'], {
-				elevation,
-				size,
-				palettize: true,
-				cropTo: size / 2,
-			});
+	await Promise.allSettled([3600, 1800, 900, 800, 600, 450, 100].map(async (size) => {
+		// await Promise.allSettled(radarData.listElevations().map(async (elevation) => {\
+		const elevation = radarData.listElevations()[0];
+		plots[elevation] = plot(radarData, ['REF', 'VEL'], {
+			elevation,
+			size,
+			palettize: true,
+			cropTo: size / 2,
+		});
 
-			// write files to disk
-			await Promise.allSettled([
-				writePngToFile(`./output/REF-${elevation}-${size}.png`, plots[elevation].REF),
-				writePngToFile(`./output/VEL-${elevation}-${size}.png`, plots[elevation].VEL),
-			]);
-		}));
+		// write files to disk
+		await Promise.allSettled([
+			writePngToFile(`./output/REF-${elevation}-${size}.png`, plots[elevation].REF),
+			writePngToFile(`./output/VEL-${elevation}-${size}.png`, plots[elevation].VEL),
+		]);
+		// }));
 	}));
 })();
