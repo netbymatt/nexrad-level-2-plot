@@ -1,5 +1,11 @@
 const fs = require('fs');
 // write a canvas to a Png file
+/**
+ * Write a Canvas to the specified file
+ * @param {string} fileName Path to write output to, passed to fs.createWriteStream
+ * @param {Canvas} data Canvas provided by the plot() function
+ * @returns Promise
+ */
 const writePngToFile = (fileName, data) => new Promise((resolve, reject) => {
 	// the draw function will return false if no data was found, short circuit the output here
 	if (!data.canvas) {

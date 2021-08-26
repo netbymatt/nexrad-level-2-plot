@@ -1,6 +1,12 @@
 const { draw, canvas } = require('./draw');
 const { writePngToFile } = require('./utils/file');
-
+/**
+ * Plot level 2 data
+ * @param {Level2Data} data output from the nexrad-level-2-data library
+ * @param {String[]} _products Options are REF, VEL, SW , ZDR, PHI and RHO
+ * @param {object} options Plotting options
+ * @returns Canvas
+ */
 const plot = (data, _products, options) => {
 	// store result
 	const result = {};
