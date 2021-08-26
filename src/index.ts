@@ -1,5 +1,11 @@
-const { draw, canvas } = require('./draw');
-const { writePngToFile } = require('./utils/file');
+import { draw, Canvas } from './draw';
+import { writePngToFile } from './utils/file';
+import { DrawOptions } from './types';
+
+interface Results {
+	[key: string]: draw,
+}
+
 /**
  * Plot level 2 data
  * @param {Level2Data} data output from the nexrad-level-2-data library
@@ -12,9 +18,9 @@ const { writePngToFile } = require('./utils/file');
  * @param {(boolean|object)} [options.palettize] After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used.
  * @returns Canvas
  */
-const plot = (data, _products, options) => {
+const plot = (data, _products:string|string[], options:DrawOptions) => {
 	// store result
-	const result = {};
+	const result:Results = {};
 
 	let products;
 	// make product list into an array
@@ -44,5 +50,5 @@ const plot = (data, _products, options) => {
 module.exports = {
 	plot,
 	writePngToFile,
-	canvas,
+	Canvas,
 };

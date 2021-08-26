@@ -4,22 +4,32 @@
 // this ensures that the colors are not blended because the index should be returned in the a position
 // after the entire image is drawn the index information must be shifted from g to a
 
+import { PaletteData } from '../../types';
+
 const rgbaLookupSize = 200;
 
-class Palette {
-	constructor(palette) {
+interface Closest {
+	[key: string]: number,
+}
+
+export default class Palette {
+	palette: number[];
+	limits: number[];
+	transparentIndex: number;
+	lookupRgba: string[];
+	closest: Closest;
+	downSampleReset: number;
+	downSample: (cur:number, prev:number)=>number;
+	inDeadband: (reset:number)=>boolean;
+
+	constructor(palette:PaletteData) {
 		this.palette = palette.palette;
 		this.limits = palette.limits;
-		this.transparentIndex = palette.transparentIndex;
+		this.transparentIndex = palette.transparentIndex ?? 0;
 		this.lookupRgba = findDbzRbgaGenerator(this.limits, this.palette, palette.maxDbzIndex);
 		this.closest = {};
 
-		// these may not exist and are overridden with default functions
-		if (palette.hasOwnProperty('downSampleReset')) {
-			this.downSampleReset = palette.downSampleReset;
-		} else {
-			this.downSampleReset = -Infinity;
-		}
+		this.downSampleReset = palette.downSampleReset ?? -Infinity;
 		if (typeof palette.downSample === 'function') {
 			this.downSample = palette.downSample;
 		} else {
@@ -33,12 +43,12 @@ class Palette {
 		}
 	}
 
-	findColorRgba(dbz) {
+	findColorRgba(dbz:number):string {
 		// find the rgba value of the color from the provided dbz value
 		return this.lookupRgba[Math.trunc(dbz + rgbaLookupSize)];
 	}
 
-	getPalette() {
+	getPalette():Uint8ClampedArray {
 		// return the palette properly formatted for the PNG function
 		const dest = new Uint8ClampedArray(256 * 4);
 		this.palette.forEach((val, idx) => {
@@ -47,14 +57,14 @@ class Palette {
 		return dest;
 	}
 
-	transparentColorRgba() {
+	transparentColorRgba():string {
 		// return the rgba value of the transparent color
-		const index = this.transparentIndex;
+		const index:number = this.transparentIndex;
 		return `rgba(${this.palette[index * 4]},${this.palette[index * 4 + 1]},${this.palette[index * 4 + 2]},${this.palette[(index * 4 + 3)] / 255})`;
 	}
 
 	// match = [r,g,b[,a]]
-	closestIndex(match) {
+	closestIndex(match:ArrayLike<number>):number {
 		// short circuit for transparent (black)
 		if (match[0] <= 2 && match[1] <= 2 && match[2] <= 2) return this.transparentIndex;
 		// short circuit previously calculated matches
@@ -79,13 +89,13 @@ class Palette {
 	}
 
 	// geometric distance
-	static geometricDistance(a, b) {
-		return a.reduce((acc, val, idx) => acc + (val - b[idx]) ** 2, 0);
+	static geometricDistance(a:ArrayLike<number>, b:ArrayLike<number>):number {
+		return Array.from(a).reduce((acc:number, val:number, idx:number) => acc + (val - b[idx]) ** 2, 0);
 	}
 }
 
 // create a lookup table of colors for faster processing
-const findDbzRbgaGenerator = (limits, palette, maxDbzIndex = 14) => {
+const findDbzRbgaGenerator = (limits:number[], palette:number[], maxDbzIndex = 14):string[] => {
 	const lookupRgba = [];
 	for (let i = -rgbaLookupSize; i <= rgbaLookupSize; i += 1) {
 		let index = limits.findIndex((limit) => i < limit);
@@ -96,8 +106,6 @@ const findDbzRbgaGenerator = (limits, palette, maxDbzIndex = 14) => {
 	return lookupRgba;
 };
 
-const downSample = (cur, prev) => (cur === null ? prev : Math.max(cur, prev));
+const downSample = (cur:number, prev:number):number => (cur === null ? prev : Math.max(cur, prev));
 
-const inDeadband = (reset) => (a) => (a === null || a === reset || a === undefined);
-
-module.exports = Palette;
+const inDeadband = (reset:number) => (a:number) => (a === null || a === reset || a === undefined);

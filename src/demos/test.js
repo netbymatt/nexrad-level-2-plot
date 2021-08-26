@@ -3,7 +3,7 @@ const { Level2Radar } = require('nexrad-level-2-data');
 const glob = require('glob');
 const fs = require('fs');
 
-const { plot, writePngToFile } = require('../src');
+const { plot, writePngToFile } = require('../index');
 
 // list files
 // const files = glob.sync('./data/KLOT/34/*');

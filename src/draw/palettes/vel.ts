@@ -1,4 +1,6 @@
-const palette = [
+import { PaletteData } from '../../types';
+
+const palette:number[] = [
 	// 0: green/outbound
 	0, 255, 0, 255,
 	0, 240, 0, 255,
@@ -33,7 +35,7 @@ const palette = [
 	255, 255, 255, 0,
 ];
 
-const downSample = (cur, prev) => {
+const downSample = (cur:number, prev:number): number => {
 	// no data, use previous value
 	if (cur === null) return prev;
 	// test for magnitude change, prev may be null but Math.abs(null) === 0 so this is valid
@@ -41,20 +43,20 @@ const downSample = (cur, prev) => {
 	return prev;
 };
 
-const limits = 	[-99, -90, -80, -70, -60, -50, -40, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 99,
+const limits:number[] = 	[-99, -90, -80, -70, -60, -50, -40, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 99,
 ];
 
 const downSampleReset = null;
 
-const maxDbzIndex = 12; // index of maximum dbz
-
 const transparentIndex = 24;
 
-module.exports = {
+const paletteData: PaletteData = {
 	palette,
 	downSample,
 	limits,
 	downSampleReset,
-	maxDbzIndex,
 	transparentIndex,
+	maxDbzIndex: 23,
 };
+
+export default paletteData;

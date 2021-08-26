@@ -1,12 +1,18 @@
-const canvasObj = require('canvas');
+import canvasObj from 'canvas';
+import Palette from './palettes';
+import REF from './palettes/ref';
+import VEL from './palettes/vel';
+import palettizeImage from './palettize';
+import { DrawOptions } from '../types';
 
 const { createCanvas } = canvasObj;
 
-const Palette = require('./palettes');
-const palettizeImage = require('./palettize');
+interface ObjectStrings {
+	[key: string]: string,
+}
 
 // names of data structures keyed to product name
-const dataNames = {
+const dataNames:ObjectStrings = {
 	REF: 'reflect',
 	VEL: 'velocity',
 	'SW ': 'spectrum',	// intentional space to fill 3-character requirement
@@ -16,21 +22,23 @@ const dataNames = {
 };
 
 // names of data retrieval routines keyed to product name
-const dataFunctions = {
+const dataFunctions:ObjectStrings = {
 	REF: 'getHighresReflectivity',
 	VEL: 'getHighresVelocity',
 };
 
+interface Palettes {
+	[key: string]: Palette,
+}
+
 // generate all palettes
-/* eslint-disable global-require */
-const palettes = {
-	REF: new Palette(require('./palettes/ref')),
-	VEL: new Palette(require('./palettes/vel')),
+const palettes:Palettes = {
+	REF: new Palette(REF),
+	VEL: new Palette(VEL),
 };
-/* eslint-enable global-require */
 
 // default options
-const DEFAULT_OPTIONS = {
+export const DEFAULT_OPTIONS = {
 	// must be a square image
 	size: 3600,
 	cropTo: 3600,
@@ -39,10 +47,15 @@ const DEFAULT_OPTIONS = {
 };
 
 // calculation constants
-const RAD45 = (45 * Math.PI / 180);
+const RAD45 = ((45 * Math.PI) / 180);
 const RAD90 = RAD45 * 2;
 
-const draw = (data, _options) => {
+export interface draw {
+	canvas: canvasObj.Canvas,
+	palette?: Uint8ClampedArray,
+}
+
+export const draw = (data, _options:DrawOptions):draw => {
 	// combine options with defaults
 	const options = {
 		...DEFAULT_OPTIONS,
@@ -97,7 +110,7 @@ const draw = (data, _options) => {
 	if (dataFunction === undefined) throw new Error(`No data function found for product: ${options.product}`);
 
 	// check for data for this product
-	if (headers[0][dataName] === undefined) return false;
+	if (headers[0][dataName] === undefined) throw new Error('No data for this product');
 
 	// loop through data
 	headers.forEach((header) => {
@@ -121,7 +134,7 @@ const draw = (data, _options) => {
 		const azWrap = (((startAngle - RAD45) % RAD90) + RAD90) % RAD90;
 		// calculate a magnitude multiplier as 1/sin with 45° shift removed
 		const azMagnitudeMult = 1 / Math.abs(Math.sin(azWrap + RAD45));
-		const cropMaxBin = Math.ceil(Math.abs(options.cropTo / 2 * scale * azMagnitudeMult));
+		const cropMaxBin = Math.ceil(Math.abs((options.cropTo / 2) * scale * azMagnitudeMult));
 
 		// compare max calculated value with length of radial
 		const maxBin = Math.min(cropMaxBin, thisRadial.moment_data.length);
@@ -179,8 +192,4 @@ const draw = (data, _options) => {
 	};
 };
 
-module.exports = {
-	draw,
-	DEFAULT_OPTIONS,
-	canvas: canvasObj,
-};
+export { Canvas } from 'canvas';

@@ -25,13 +25,18 @@
   "homepage": "https://github.com/netbymatt/nexrad-level-2-plot#readme",
   "dependencies": {
     "canvas": "^2.8.0",
-		"nexrad-level-2-data": "file:../nexrad-level-2-data"
+    "nexrad-level-2-data": "file:../nexrad-level-2-data"
   },
   "devDependencies": {
+    "@types/node": "^16.7.2",
+    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/parser": "^4.29.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-import-resolver-typescript": "^2.4.0",
     "eslint-plugin-import": "^2.23.4",
-    "glob": "^7.1.7"
+    "glob": "^7.1.7",
+    "typescript": "^4.3.5"
   },
   "engines": {
     "node": ">=13.0.0"

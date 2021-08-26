@@ -11,7 +11,29 @@
 			"skipFiles": [
 				"<node_internals>/**"
 			],
-			"program": "${workspaceFolder}/demos/test.js"
+			"program": "${workspaceFolder}/dist/demos/test.js",
+			"preLaunchTask": "tsc: build - tsconfig.json",
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js",
+				"!**/node_modules/**"
+			],
+			"internalConsoleOptions": "openOnSessionStart",
+		},
+		{
+			"type": "pwa-node",
+			"request": "launch",
+			"name": "Test Single",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"program": "${workspaceFolder}/dist/demos/test.js",
+			"preLaunchTask": "tsc: build - tsconfig.json",
+			"args": ["single"],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js",
+				"!**/node_modules/**"
+			],
+			"internalConsoleOptions": "openOnSessionStart"
 		}
 	]
 }

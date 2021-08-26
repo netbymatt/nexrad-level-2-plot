@@ -1,6 +1,7 @@
-const { createCanvas } = require('canvas');
+import { createCanvas, CanvasRenderingContext2D, Canvas } from 'canvas';
+import Palette from './palettes';
 
-const palettizeImage = (sourceCtx, palette) => {
+const palettizeImage = (sourceCtx:CanvasRenderingContext2D, palette: Palette):Canvas => {
 	// get the dimensions of the image from the ctx
 	const dim = {
 		x: sourceCtx.canvas.width,
@@ -30,4 +31,4 @@ const palettizeImage = (sourceCtx, palette) => {
 	return indexedCanvas;
 };
 
-module.exports = palettizeImage;
+export default palettizeImage;
