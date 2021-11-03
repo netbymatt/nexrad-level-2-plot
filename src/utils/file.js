@@ -26,6 +26,18 @@ const writePngToFile = (fileName, data) => new Promise((resolve, reject) => {
 	writeStream.on('error', (e) => reject(e));
 });
 
+const writeSvgToFile = async (fileName, data) => {
+	// the draw function will return false if no data was found, short circuit the output here
+	if (!data.canvas) {
+		return;
+	}
+
+	// write to the stream
+	await fs.promises.writeFile(fileName, data.canvas.svg());
+	console.log(fileName);
+};
+
 module.exports = {
 	writePngToFile,
+	writeSvgToFile,
 };

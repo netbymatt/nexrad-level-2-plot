@@ -1,5 +1,5 @@
 const { draw, canvas } = require('./draw');
-const { writePngToFile } = require('./utils/file');
+const { writePngToFile, writeSvgToFile } = require('./utils/file');
 /**
  * Plot level 2 data
  * @param {Level2Data} data output from the nexrad-level-2-data library
@@ -44,5 +44,6 @@ const plot = (data, _products, options) => {
 module.exports = {
 	plot,
 	writePngToFile,
+	writeSvgToFile,
 	canvas,
 };

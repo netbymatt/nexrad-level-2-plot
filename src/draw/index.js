@@ -1,9 +1,8 @@
-const canvasObj = require('canvas');
+const { createSVGWindow } = require('svgdom');
 
-const { createCanvas } = canvasObj;
+const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 
 const Palette = require('./palettes');
-const palettizeImage = require('./palettize');
 
 // names of data structures keyed to product name
 const dataNames = {
@@ -42,7 +41,25 @@ const DEFAULT_OPTIONS = {
 const RAD45 = (45 * Math.PI / 180);
 const RAD90 = RAD45 * 2;
 
+// round to specified number of decimal points
+const roundTo = (decimals, value) => Math.round(value * 10 ** decimals) / 10 ** decimals;
+
+// polar to cartesean conversion
+const polarToCartesean = (r, theta) => {
+	const x = roundTo(2, r * Math.cos(theta));
+	const y = roundTo(2, r * Math.sin(theta));
+	return {
+		x, y,
+	};
+};
+
 const draw = (data, _options) => {
+	// create a new window
+	const window = createSVGWindow();
+	const { document } = window;
+	// register window and document
+	registerWindow(window, document);
+
 	// combine options with defaults
 	const options = {
 		...DEFAULT_OPTIONS,
@@ -58,19 +75,10 @@ const draw = (data, _options) => {
 	const cropTo = Math.min(options.size, options.cropTo);
 	if (options.cropTo < 1) throw new Error('Provide options.cropTo > 0');
 
-	// create the canvas and context
-	const canvas = createCanvas(cropTo, cropTo);
-	const ctx = canvas.getContext('2d');
-
-	// fill background with black
-	ctx.fillStyle = options.background;
-	ctx.fillRect(0, 0, cropTo, cropTo);
-
-	// canvas settings
-	ctx.imageSmoothingEnabled = true;
-	ctx.lineWidth = options.lineWidth;
-	ctx.translate(cropTo / 2, cropTo / 2);
-	ctx.rotate(-Math.PI / 2);
+	// create the canvas
+	const canvas = SVG(document.documentElement);
+	canvas.size(cropTo, cropTo);
+	canvas.viewbox(-cropTo / 2, -cropTo / 2, cropTo, cropTo);
 
 	// get the palette
 	const palette = palettes[options.product];
@@ -98,6 +106,8 @@ const draw = (data, _options) => {
 
 	// check for data for this product
 	if (headers[0][dataName] === undefined) return false;
+
+	const paths = {};
 
 	// loop through data
 	headers.forEach((header) => {
@@ -153,34 +163,40 @@ const draw = (data, _options) => {
 
 				// see if there's a sample to plot
 				if (thisSample && !palette.inDeadband(thisSample)) {
-					ctx.beginPath();
-					ctx.strokeStyle = palette.findColorRgba(thisSample);
-					ctx.arc(0, 0, (idx + deadZone) / scale, startAngle, endAngle);
-					ctx.stroke();
+					// get color
+					const color = palette.findColorRgba(thisSample);
+
+					if (!paths[color]) paths[color] = [];
+
+					// calculate radius
+					const r = (idx + deadZone) / scale;
+					const rRounded = roundTo(2, r);
+
+					// calculate start of arc
+					const arcStartCartesean = polarToCartesean(r, startAngle);
+					paths[color].push(['M', arcStartCartesean.x, arcStartCartesean.y]);
+
+					// calculate end of arc
+					const arcEndCartesean = polarToCartesean(r, endAngle);
+
+					// end of arc and flags
+					paths[color].push(['A', rRounded, rRounded, 0, 0, 0, arcEndCartesean.x, arcEndCartesean.y]);
 				}
 			}
 		}
 	});
+	// draw each path
+	Object.entries(paths).forEach(([color, path]) => {
+		path.push('z');
+		canvas.path(path.flat()).stroke({ color });
+	});
 
-	if (!options.palettize) {
-	// return the palette and canvas
-		return {
-			canvas,
-		};
-	}
-
-	// palettize image
-	const palettized = palettizeImage(canvas.getContext('2d'), palette);
-
-	// return palettized image
 	return {
-		canvas: palettized,
-		palette: palette.getPalette(),
+		canvas,
 	};
 };
 
 module.exports = {
 	draw,
 	DEFAULT_OPTIONS,
-	canvas: canvasObj,
 };

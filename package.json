@@ -24,8 +24,9 @@
   },
   "homepage": "https://github.com/netbymatt/nexrad-level-2-plot#readme",
   "dependencies": {
-    "canvas": "^2.8.0",
-		"nexrad-level-2-data": "file:../nexrad-level-2-data"
+    "@svgdotjs/svg.js": "^3.1.1",
+    "nexrad-level-2-data": "file:../nexrad-level-2-data",
+    "svgdom": "^0.1.8"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

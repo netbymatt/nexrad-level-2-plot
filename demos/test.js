@@ -3,16 +3,16 @@ const { Level2Radar } = require('nexrad-level-2-data');
 const glob = require('glob');
 const fs = require('fs');
 
-const { plot, writePngToFile } = require('../src');
+const { plot, writeSvgToFile } = require('../src');
 
 // list files
 // const files = glob.sync('./data/KLOT/34/*');
-// const files = glob.sync('./data/KLOT/381/*');
+const files = glob.sync('./data/KLOT/381/*');
 // const files = glob.sync('./data/KLOT/548/*');
 // const files = glob.sync('./data/KLOT/940/*');
 // const files = glob.sync('./data/KSRX/804/*');
 // const files = glob.sync('./data/TORD/767/*');
-const files = glob.sync('./data/KLOT/KLOT20210812_171451_V*');	// ref palette tuning
+// const files = glob.sync('./data/KLOT/KLOT20210812_171451_V*');	// ref palette tuning
 // const files = glob.sync('./data/KLOT/KLOT20210621_041151_V06');	// vel palette tuning
 
 // const store each file's data
@@ -33,7 +33,7 @@ const plots = [];
 // default to all plots unless single is specificed
 const single = process.argv.includes('single');
 
-let sizes = [3600, 1800, 900, 800, 600, 450, 100];
+let sizes = [900, 450, 100];
 let elevations = radarData.listElevations();
 if (single) {
 	sizes = sizes.slice(0, 1);
@@ -51,13 +51,13 @@ if (single) {
 				elevation,
 				size,
 				palettize: true,
-				cropTo: size / 2,
+				// cropTo: size / 2,
 			});
 
 			// write files to disk
 			await Promise.allSettled([
-				writePngToFile(`./output/REF-${elevation}-${size}.png`, plots[elevation].REF),
-				writePngToFile(`./output/VEL-${elevation}-${size}.png`, plots[elevation].VEL),
+				writeSvgToFile(`./output/REF-${elevation}-${size}.svg`, plots[elevation].REF),
+				writeSvgToFile(`./output/VEL-${elevation}-${size}.svg`, plots[elevation].VEL),
 			]);
 		}));
 	}));
