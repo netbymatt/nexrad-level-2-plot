@@ -18,11 +18,11 @@ const downSample = (radials, scale, resolution, options, palette) => {
 		let downsampled = null;
 		let lastRemainder = 0;
 
-		const startAngle = radial.azimuth * (Math.PI / 180) - halfResolution;
+		const azimuth = radial.azimuth * (Math.PI / 180) - halfResolution;
 
 		// calculate maximum bin to plot based on azimuth
-		// wrap azimuth to 90° offset by -45° (% in js is remainder, the formula below make it in to modulus)
-		const azWrap = (((startAngle - RAD45) % RAD90) + RAD90) % RAD90;
+		// wrap azimuth to 90° offset by -45° (% in js is remainder, the formula below makes it in to modulus)
+		const azWrap = (((azimuth - RAD45) % RAD90) + RAD90) % RAD90;
 		// calculate a magnitude multiplier as 1/sin with 45° shift removed
 		const azMagnitudeMult = 1 / Math.abs(Math.sin(azWrap + RAD45));
 		const cropMaxBin = Math.ceil(Math.abs(options.cropTo / 2 * scale * azMagnitudeMult));

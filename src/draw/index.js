@@ -118,7 +118,7 @@ const draw = (data, _options) => {
 			if (bin !== null) {
 				ctx.beginPath();
 				ctx.strokeStyle = palette.lookupRgba[bin];
-				ctx.arc(0, 0, (idx + deadZone) / scale, startAngle, endAngle);
+				ctx.arc(0, 0, (idx + deadZone), startAngle, endAngle);
 				ctx.stroke();
 			}
 		});
