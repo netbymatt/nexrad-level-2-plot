@@ -33,7 +33,7 @@ const plots = [];
 // default to all plots unless single is specificed
 const single = process.argv.includes('single');
 
-let sizes = [3600, 1800, 900, 800, 600, 450, 100];
+let sizes = [1800, 900, 800, 600, 450, 100];
 let elevations = radarData.listElevations();
 if (single) {
 	sizes = sizes.slice(0, 1);

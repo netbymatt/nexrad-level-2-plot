@@ -5,6 +5,11 @@ const { createCanvas } = canvasObj;
 const Palette = require('./palettes');
 const palettizeImage = require('./palettize');
 
+// data pre-processing
+const filterProduct = require('./preprocess/filterproduct');
+const downSample = require('./preprocess/downsample');
+const indexProduct = require('./preprocess/indexproduct');
+
 // names of data structures keyed to product name
 const dataNames = {
 	REF: 'reflect',
@@ -37,10 +42,6 @@ const DEFAULT_OPTIONS = {
 	background: 'black',
 	lineWidth: 2,
 };
-
-// calculation constants
-const RAD45 = (45 * Math.PI / 180);
-const RAD90 = RAD45 * 2;
 
 const draw = (data, _options) => {
 	// combine options with defaults
@@ -99,67 +100,28 @@ const draw = (data, _options) => {
 	// check for data for this product
 	if (headers[0][dataName] === undefined) return false;
 
+	// pre-processing
+	const filteredProduct = filterProduct(headers, dataName);
+	const downSampledProduct = downSample(filteredProduct, scale, resolution, options, palette);
+	const indexedProduct = indexProduct(downSampledProduct, palette);
+
 	// loop through data
-	headers.forEach((header) => {
-		// get correct data
-		const thisRadial = header[dataName];
-		// skip if this radial isn't found
-		if (thisRadial === undefined) return;
-
+	indexedProduct.forEach((radial) => {
 		// calculate plotting parameters
-		const deadZone = thisRadial.first_gate / thisRadial.gate_size;
+		const deadZone = radial.first_gate / radial.gate_size;
 
-		const startAngle = header.azimuth * (Math.PI / 180) - halfResolution;
+		const startAngle = radial.azimuth * (Math.PI / 180) - halfResolution;
 		const endAngle = startAngle + resolution;
 
-		// track max value for downsampling(d)
-		let downsampled = 0;
-		let lastRemainder = 0;
-
-		// calculate maximum bin to plot based on azimuth
-		// wrap azimuth to 90° offset by -45° (% in js is remainder, the formula below make it in to modulus)
-		const azWrap = (((startAngle - RAD45) % RAD90) + RAD90) % RAD90;
-		// calculate a magnitude multiplier as 1/sin with 45° shift removed
-		const azMagnitudeMult = 1 / Math.abs(Math.sin(azWrap + RAD45));
-		const cropMaxBin = Math.ceil(Math.abs(options.cropTo / 2 * scale * azMagnitudeMult));
-
-		// compare max calculated value with length of radial
-		const maxBin = Math.min(cropMaxBin, thisRadial.moment_data.length);
-
 		// plot each bin
-		for (let idx = 0; idx < maxBin; idx += 1) {
-			// get the value
-			const bin = thisRadial.moment_data[idx];
-			// skip null values
+		radial.moment_data.forEach((bin, idx) => {
 			if (bin !== null) {
-				let thisSample;
-				// test for downsampling
-				if (scale !== 1) {
-					const remainder = idx % scale;
-					// test for rollover in scaling
-					if (remainder < lastRemainder) {
-					// plot this point and reset values
-						thisSample = downsampled;
-						downsampled = 0;
-					}
-
-					// store this sample if it meets downsample requirements
-					downsampled = palette.downSample(bin, downsampled);
-					// store for rollover tracking
-					lastRemainder = remainder;
-				} else {
-					thisSample = bin;
-				}
-
-				// see if there's a sample to plot
-				if (thisSample && !palette.inDeadband(thisSample)) {
-					ctx.beginPath();
-					ctx.strokeStyle = palette.findColorRgba(thisSample);
-					ctx.arc(0, 0, (idx + deadZone) / scale, startAngle, endAngle);
-					ctx.stroke();
-				}
+				ctx.beginPath();
+				ctx.strokeStyle = palette.lookupRgba[bin];
+				ctx.arc(0, 0, (idx + deadZone) / scale, startAngle, endAngle);
+				ctx.stroke();
 			}
-		}
+		});
 	});
 
 	if (!options.palettize) {
