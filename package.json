@@ -1,6 +1,6 @@
 {
   "name": "nexrad-level-2-plot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Plotting library for nexrad-level-2-data",
   "main": "src/index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "homepage": "https://github.com/netbymatt/nexrad-level-2-plot#readme",
   "dependencies": {
     "canvas": "^2.8.0",
-		"nexrad-level-2-data": "file:../nexrad-level-2-data"
+    "nexrad-level-2-data": "file:../nexrad-level-2-data"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
