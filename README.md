@@ -79,9 +79,7 @@ A full size plot is 3600 x 3600 pixels. This corresponds to the maximum range of
 
 options.size < 3600 will internally scale the image to the selected size. The scaling algorithm is specific to radar data and returns the maximum value over the range of bins that are combined due to the scaling factor. This ensures that maximum reflectivity or maximum velocity are preserved during the scaling process. Using an image scaling package is not preferred in this case as the scaling algorithm used my mask important data.
 
-options.size > 3600 is invalid as this would cause data to be interpolated and would not be a true representation of the data returned by the radar. If you need this functionality it's recommended to use an image scaling package such as [jimp](https://www.npmjs.com/package/jimp) or [gm](https://www.npmjs.com/package/gm) on the Canvas returned by plot().
-
-options.crop 
+options.size > 3600 is invalid as this would cause data to be interpolated and would not be a true representation of the data returned by the radar. If you need this functionality it's recommended to use an image scaling package such as [jimp](https://www.npmjs.com/package/jimp) or [gm](https://www.npmjs.com/package/gm) on the Canvas returned by plot() which will also be much faster than the drawing methods used for a radar plot.
 
 ### Palettizing
 >If used with [plotAndData()](#plotanddatafile-options) both the original image and the palettized image will be returned if used with [plot()](#plotfile-options) only the palettized image will be returned.
@@ -90,7 +88,7 @@ Plotting what is essentially polar data (raw radar data) to a cartesean coordina
 
 This process makes use of the RGBA color space with either 3 or 4 bytes per pixel. From the standpoint of representing radar data in an image this is very inefficient use of space as typically 16 or 32 colors (> 1 byte) is necessary to show the data in it's original format. This RGBA image also does not lend itself well to PNG compression which is lossless.
 
-Palettizing introduces a compromise between image size and compresability. After the initial image is drawing the palettizing algorithm can then re-process the RGBA image and force all pixels to be one of the original color values specificed in the product's palette (options.palettize = true, the default). It can also generate an optimized palette that uses a set number of steps between the colors in the palette and the background color with a maximum generated palette size of 256 colors (options.palettize.generate = <steps>). Finally a custom palette can be provided in the form of [r1,g1,b1,r2,g2,b2,...] alpha values will be generated automatically.
+Palettizing introduces a compromise between image size and compresability. After the initial image is drawn the palettizing algorithm can then re-process the RGBA image and force all pixels to be one of the original color values specificed in the product's palette (options.palettize = true, the default). It can also generate an optimized palette that uses a set number of steps between the colors in the palette and the background color with a maximum generated palette size of 256 colors (options.palettize.generate = <steps>). Finally a custom palette can be provided in the form of [r1,g1,b1,r2,g2,b2,...] alpha values will be generated automatically.
 
 A look-up table is created and cached as part of the palettization process speeding up additional calls the the palettizing function. The cache is specific to the product and options provided.
 
@@ -107,6 +105,13 @@ Writes a PNG file to disk. Provided as a convenience function for production and
 |---|---|---|
 fileName|string|A file name or path used by [fs.createWriteStream()](https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options).
 data|{canvas[palette]}|Typically the output of [plot()](#plotfile-options).\<product type>.
+
+# Notable and breaking changes
+
+## v1.1.0 Notable, RRLE pre-processing
+Testing and monitoring of this package in production showed that drawing each 0.5&deg; or 1.0&deg; arc as part of the plotting process was very time-expensive. Drawing a wider arc when adjacent radials had the same color at this position was significantly faster than drawing the two separate arcs.
+
+Implementing this solution which I am calling Radial Run Length Encoding, as it spans several radials, required significant reworking of the plotting engine and resulted in much more modular code. Four pre-process routines are now run on the radar data before plotting. The first three: Downsample, FilterProduct and IndexProduct were all part of the previous version but have been extracted from the main algorithm and placed into their own modules. After each of these three modules were implemented tests were run to show that the image generated was identical to v1.0.0. The addition of the rrle pre-processing module does change the output image slightly, but these visual changes are in the level of the artifacts that are inevitable due to the polar-to-raster conversion detailed in [Palletizing](#palettizing).
 
 # Acknowledgements
 The code for this project is based upon:

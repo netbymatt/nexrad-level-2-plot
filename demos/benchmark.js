@@ -29,7 +29,7 @@ const elevation = 1;
 // plot for each elevation and size
 (async () => {
 	const start = new Date();
-	for (let i = 0; i < 500; i += 1) {
+	for (let i = 0; i < 100; i += 1) {
 		plots[elevation] = plot(radarData, ['REF', 'VEL'], {
 			elevation,
 			size,
