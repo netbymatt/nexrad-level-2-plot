@@ -9,6 +9,7 @@ const palettizeImage = require('./palettize');
 const filterProduct = require('./preprocess/filterproduct');
 const downSample = require('./preprocess/downsample');
 const indexProduct = require('./preprocess/indexproduct');
+const rrle = require('./preprocess/rrle');
 
 // names of data structures keyed to product name
 const dataNames = {
@@ -85,7 +86,7 @@ const draw = (data, _options) => {
 
 	// calculate resolution in radians, default to 1°
 	let resolution = Math.PI / 180;
-	if (data?.vcp?.record?.elevation?.s[options.elevation]?.super_res_control?.super_res?.halfDegreeAzimuth) resolution /= 2;
+	if (data?.vcp?.record?.elevations?.[options.elevation]?.super_res_control?.super_res?.halfDegreeAzimuth) resolution /= 2;
 	// calculate half resolution step for additional calculations below
 	const halfResolution = resolution / 2;
 
@@ -104,21 +105,31 @@ const draw = (data, _options) => {
 	const filteredProduct = filterProduct(headers, dataName);
 	const downSampledProduct = downSample(filteredProduct, scale, resolution, options, palette);
 	const indexedProduct = indexProduct(downSampledProduct, palette);
+	const rrlEncoded = rrle(indexedProduct, resolution);
 
 	// loop through data
-	indexedProduct.forEach((radial) => {
+	rrlEncoded.forEach((radial) => {
 		// calculate plotting parameters
-		const deadZone = radial.first_gate / radial.gate_size;
+		const deadZone = radial.first_gate / radial.gate_size / scale;
 
-		const startAngle = radial.azimuth * (Math.PI / 180) - halfResolution;
-		const endAngle = startAngle + resolution;
+		// 10% is added to the arc to ensure that each arc bleeds into the next just slightly to avoid radial empty spaces at further distances
+		const startAngle = radial.azimuth * (Math.PI / 180) - halfResolution * 1.1;
+		const endAngle = radial.azimuth * (Math.PI / 180) + halfResolution * 1.1;
 
 		// plot each bin
 		radial.moment_data.forEach((bin, idx) => {
 			if (bin !== null) {
 				ctx.beginPath();
-				ctx.strokeStyle = palette.lookupRgba[bin];
-				ctx.arc(0, 0, (idx + deadZone), startAngle, endAngle);
+				// different methods for rrle encoded or not
+				if (bin.count) {
+					// rrle encoded
+					ctx.strokeStyle = palette.lookupRgba[bin.value];
+					ctx.arc(0, 0, (idx + deadZone), startAngle, endAngle + resolution * (bin.count - 1));
+				} else {
+					// plain data
+					ctx.strokeStyle = palette.lookupRgba[bin];
+					ctx.arc(0, 0, (idx + deadZone), startAngle, endAngle);
+				}
 				ctx.stroke();
 			}
 		});

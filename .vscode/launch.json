@@ -12,6 +12,15 @@
 				"<node_internals>/**"
 			],
 			"program": "${workspaceFolder}/demos/test.js"
+		},
+		{
+			"type": "pwa-node",
+			"request": "launch",
+			"name": "Benchmark",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"program": "${workspaceFolder}/demos/benchmark.js"
 		}
 	]
 }
