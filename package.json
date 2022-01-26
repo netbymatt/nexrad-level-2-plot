@@ -28,8 +28,8 @@
     "nexrad-level-2-data": "file:../nexrad-level-2-data"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint": "^8.0.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.23.4",
     "glob": "^7.1.7"
   },
