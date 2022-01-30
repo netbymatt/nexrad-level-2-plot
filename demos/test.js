@@ -14,6 +14,7 @@ const { plot, writePngToFile } = require('../src');
 // const files = glob.sync('./data/TORD/767/*');
 const files = glob.sync('./data/KLOT/KLOT20210812_171451_V*');	// ref palette tuning
 // const files = glob.sync('./data/KLOT/KLOT20210621_041151_V06');	// vel palette tuning
+// const files = glob.sync('./data/non-hi-res/*');
 
 // const store each file's data
 const chunks = [];

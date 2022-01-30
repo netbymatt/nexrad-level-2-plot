@@ -60,20 +60,6 @@ const draw = (data, _options) => {
 	const cropTo = Math.min(options.size, options.cropTo);
 	if (options.cropTo < 1) throw new Error('Provide options.cropTo > 0');
 
-	// create the canvas and context
-	const canvas = createCanvas(cropTo, cropTo);
-	const ctx = canvas.getContext('2d');
-
-	// fill background with black
-	ctx.fillStyle = options.background;
-	ctx.fillRect(0, 0, cropTo, cropTo);
-
-	// canvas settings
-	ctx.imageSmoothingEnabled = true;
-	ctx.lineWidth = options.lineWidth;
-	ctx.translate(cropTo / 2, cropTo / 2);
-	ctx.rotate(-Math.PI / 2);
-
 	// get the palette
 	const palette = palettes[options.product];
 	// test for valid palette
@@ -107,10 +93,27 @@ const draw = (data, _options) => {
 	const indexedProduct = indexProduct(downSampledProduct, palette);
 	const rrlEncoded = rrle(indexedProduct, resolution);
 
+	// create the canvas and context
+	const canvas = createCanvas(cropTo, cropTo);
+	const ctx = canvas.getContext('2d');
+
+	// fill background with black
+	ctx.fillStyle = options.background;
+	ctx.fillRect(0, 0, cropTo, cropTo);
+
+	// calculate a gate size against the nominal size
+	const gateScale = rrlEncoded[0].gate_size / 0.25;
+
+	// canvas settings
+	ctx.imageSmoothingEnabled = true;
+	ctx.lineWidth = options.lineWidth * gateScale;
+	ctx.translate(cropTo / 2, cropTo / 2);
+	ctx.rotate(-Math.PI / 2);
+
 	// loop through data
 	rrlEncoded.forEach((radial) => {
 		// calculate plotting parameters
-		const deadZone = radial.first_gate / radial.gate_size / scale;
+		const deadZone = radial.first_gate / radial.gate_size / scale * gateScale;
 
 		// 10% is added to the arc to ensure that each arc bleeds into the next just slightly to avoid radial empty spaces at further distances
 		const startAngle = radial.azimuth * (Math.PI / 180) - halfResolution * 1.1;
@@ -124,11 +127,11 @@ const draw = (data, _options) => {
 				if (bin.count) {
 					// rrle encoded
 					ctx.strokeStyle = palette.lookupRgba[bin.value];
-					ctx.arc(0, 0, (idx + deadZone), startAngle, endAngle + resolution * (bin.count - 1));
+					ctx.arc(0, 0, (idx + deadZone) * gateScale, startAngle, endAngle + resolution * (bin.count - 1));
 				} else {
 					// plain data
 					ctx.strokeStyle = palette.lookupRgba[bin];
-					ctx.arc(0, 0, (idx + deadZone), startAngle, endAngle);
+					ctx.arc(0, 0, (idx + deadZone) * gateScale, startAngle, endAngle);
 				}
 				ctx.stroke();
 			}
