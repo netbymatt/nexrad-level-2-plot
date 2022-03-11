@@ -61,9 +61,12 @@ const draw = (data, _options) => {
 	};
 
 	// check preferred waveforms
-	const elevationInfo = data.vcp.record.elevations[options.elevation];
-	const preferredProducts = preferredWaveformUsage[elevationInfo.waveform_type];
-	if (options.usePreferredWaveforms && !preferredProducts.includes(options.product)) return false;
+	const elevationInfo = data?.vcp?.record?.elevations?.[options?.elevation];
+	// elevation info is not available in chunks mode, so preferred waveforms cannot be processed
+	if (elevationInfo) {
+		const preferredProducts = preferredWaveformUsage[elevationInfo.waveform_type];
+		if (options.usePreferredWaveforms && !preferredProducts.includes(options.product)) return false;
+	}
 
 	// calculate scale
 	if (options.size > DEFAULT_OPTIONS.size) throw new Error(`Upsampling is not supported. Provide a size <= ${DEFAULT_OPTIONS.size}`);
