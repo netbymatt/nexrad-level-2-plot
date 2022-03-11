@@ -10,6 +10,8 @@ const { writePngToFile } = require('./utils/file');
  * @param {string} [options.background=#000000] Background color of the image. This can be transparent by using #RGBA notation.
  * @param {number} [options.lineWidth=2] The raster image is created by drawing several arcs at the locations and colors specified in the data file. When scaling down you may get a better looking image by adjusting this value to something large than the default.
  * @param {(boolean|object)} [options.palettize] After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used.
+ * @param {(undefined|number|number[])} [options.elevations=undefined] List of elevations to plot.
+ * @param {boolean} [options.usePreferredWaveforms = true] Limit the plotted data to the preferred use of waveforms 1 and 2.
  * @returns Canvas
  */
 const plot = (data, _products, options) => {

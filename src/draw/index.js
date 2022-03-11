@@ -35,6 +35,14 @@ const palettes = {
 };
 /* eslint-enable global-require */
 
+const preferredWaveformUsage = {
+	1: ['REF', 'SW ', 'ZDR', 'PHI', 'RHO'],
+	2: ['VEL'],
+	3: ['REF', 'VEL', 'SW ', 'ZDR', 'PHI', 'RHO'],
+	4: ['REF', 'VEL', 'SW ', 'ZDR', 'PHI', 'RHO'],
+	5: ['REF', 'VEL', 'SW ', 'ZDR', 'PHI', 'RHO'],
+};
+
 // default options
 const DEFAULT_OPTIONS = {
 	// must be a square image
@@ -42,6 +50,7 @@ const DEFAULT_OPTIONS = {
 	cropTo: 3600,
 	background: 'black',
 	lineWidth: 2,
+	usePreferredWaveforms: true,
 };
 
 const draw = (data, _options) => {
@@ -50,6 +59,11 @@ const draw = (data, _options) => {
 		...DEFAULT_OPTIONS,
 		..._options,
 	};
+
+	// check preferred waveforms
+	const elevationInfo = data.vcp.record.elevations[options.elevation];
+	const preferredProducts = preferredWaveformUsage[elevationInfo.waveform_type];
+	if (options.usePreferredWaveforms && !preferredProducts.includes(options.product)) return false;
 
 	// calculate scale
 	if (options.size > DEFAULT_OPTIONS.size) throw new Error(`Upsampling is not supported. Provide a size <= ${DEFAULT_OPTIONS.size}`);
