@@ -47,15 +47,19 @@ Test code and data is provided in the `./demo` folder. `test.js` can be used to 
 # API
 
 ## plot(data, products, options)
-Returns an object
+Returns an array of objects. The order of elevations in the returned array matches the order of elevations in options.elevations
 ``` javascript
-	{
-		REF: {
-			canvas: <Canvas>,
-			palette: <Uint8ClampedArray>
+	[
+		{
+			elevation: <integer>,
+			REF: {
+				canvas: <Canvas>,
+				palette: <Uint8ClampedArray>
+			},
+			//... additional products
 		},
-		//... additional products
-	}
+	// ... additional elevations
+	]
 ```
 The first level key in the returned object represents each requested product.
 > Note: Each product may return false if no data was found for the specified elevation and product.
@@ -73,6 +77,7 @@ options.cropTo|integer|3600|1 to 3600. After scaling and downsampling as describ
 options.background|string|#000000|Background color of the image. This can be transparent by using #RGBA notation. See [ctx.fillStyle](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle) for more information.
 options.lineWidth|integer|2|The raster image is created by drawing several arcs at the locations and colors specified in the data file. When scaling down you may get a better looking image by adjusting this value to something large than the default.
 options.palettize|boolean\|object|false|After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used. Additional options are described in [palettizing](#palettizing). This can significantly reduce the size of the resulting image with minimal loss of clarity.
+options.elevations|undefined\|integer\|Array of integers|undefined|The specific elevations to plot. If undefined (default) all available elevations will be plotted. If an integer is provided a single elevation will be plotted with all the selected ```products```. If an array of integers are provided each ```products``` in each elevation will be plotted. Note that when a product and elevation combination do not exist the returned object will have false in the missing location. This is common where elevation 1 will have reflectivity data and elevation 2 (altough at the same angle as elevation 1) will contain velocity data.
 
 ### Downsampling
 A full size plot is 3600 x 3600 pixels. This corresponds to the maximum range of the radar 460km (~250 mi) * maximum resolution 0.25 mi/bin * 2 (east and west side of radar).
@@ -107,6 +112,11 @@ fileName|string|A file name or path used by [fs.createWriteStream()](https://nod
 data|{canvas[palette]}|Typically the output of [plot()](#plotfile-options).\<product type>.
 
 # Notable and breaking changes
+
+## v2.0.0 Breaking, returns an array of objects
+Previously, a single elevation would be plotted by the routine. The elevation was selected by ```options.elevation```. ```options.elevation``` has been renamed to ```options.elevations``` and will still take a single integer as an input, but in this configuration an array is still returned. The simplest way to return to the functionality of v1.1.0 is ```plot(data,products,{elevation: <integer>})[0]``` which will return only the first object in the array.
+
+```options.elevations``` defaults to all the elevations in the provided file. This may not be the desired behavior, and will take significantly longer to plot if you do not need all of the data provided. You can query ```data.listElevations()``` to return an array of available elevations. The result can be passed directly to options.elevations or further processed to only select interesting elevations before calling ```plot()```. Additional details of ```options.elevations``` are provided above.
 
 ## v1.1.0 Notable, RRLE pre-processing
 Testing and monitoring of this package in production showed that drawing each 0.5&deg; or 1.0&deg; arc as part of the plotting process was very time-expensive. Drawing a wider arc when adjacent radials had the same color at this position was significantly faster than drawing the two separate arcs.

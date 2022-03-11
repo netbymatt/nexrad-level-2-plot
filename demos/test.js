@@ -27,9 +27,6 @@ files.forEach((file) => {
 // combine data
 const radarData = Level2Radar.combineData(chunks);
 
-// result array by elevations
-const plots = [];
-
 // default to all plots unless single is specificed
 const single = process.argv.includes('single');
 
@@ -46,19 +43,20 @@ if (single) {
 // plot for each elevation and size
 (async () => {
 	await Promise.allSettled(sizes.map(async (size) => {
-		await Promise.allSettled(elevations.map(async (elevation) => {
-			plots[elevation] = plot(radarData, ['REF', 'VEL'], {
-				elevation,
-				size,
-				palettize: true,
-				cropTo: size / 2,
-			});
+		const plots = plot(radarData, ['REF', 'VEL'], {
+			elevations,
+			size,
+			palettize: true,
+			cropTo: size / 2,
+		});
 
-			// write files to disk
-			await Promise.allSettled([
-				writePngToFile(`./output/REF-${elevation}-${size}.png`, plots[elevation].REF),
-				writePngToFile(`./output/VEL-${elevation}-${size}.png`, plots[elevation].VEL),
-			]);
-		}));
+		// write files to disk
+		const writePromises = [];
+		plots.forEach((p) => {
+			const { elevation } = p;
+			writePromises.push(writePngToFile(`./output/REF-${elevation}-${size}.png`, p.REF));
+			writePromises.push(writePngToFile(`./output/VEL-${elevation}-${size}.png`, p.VEL));
+		});
+		await Promise.allSettled(writePromises);
 	}));
 })();

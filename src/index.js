@@ -14,7 +14,7 @@ const { writePngToFile } = require('./utils/file');
  */
 const plot = (data, _products, options) => {
 	// store result
-	const result = {};
+	const result = [];
 
 	let products;
 	// make product list into an array
@@ -28,16 +28,27 @@ const plot = (data, _products, options) => {
 	}
 
 	// get the available elevations
-	const elevations = data.listElevations();
-	if (elevations.length === 0) throw new Error('No elevations availabe');
+	const availableElevations = data.listElevations();
+	if (availableElevations.length === 0) throw new Error('No elevations availabe');
 
-	products.forEach((product) => {
-		// parse and store result
-		result[product] = draw(data, {
-			...options,
-			product,
+	// handle options.elevations defaults
+	let elevations = options?.elevations;
+	if (!elevations) elevations = availableElevations;
+	if (typeof elevations === 'number') elevations = [elevations];
+
+	elevations.forEach((elevation) => {
+		const elevationResult = { elevation };
+		products.forEach((product) => {
+			// parse and store result
+			elevationResult[product] = draw(data, {
+				...options,
+				elevation,
+				product,
+			});
 		});
+		result.push(elevationResult);
 	});
+
 	return result;
 };
 
