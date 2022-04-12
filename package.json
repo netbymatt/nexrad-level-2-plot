@@ -28,10 +28,16 @@
     "nexrad-level-2-data": "^2.1.0"
   },
   "devDependencies": {
+    "del": "^6.0.0",
     "eslint": "^8.0.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.23.4",
-    "glob": "^7.1.7"
+    "eslint-plugin-jsdoc": "^39.2.0",
+    "glob": "^8.0.1",
+    "gulp": "^4.0.2",
+    "gulp-jsdoc3": "^3.0.0",
+    "jsdoc": "^3.6.10",
+    "jsdoc-to-markdown": "^7.1.1"
   },
   "engines": {
     "node": ">=13.0.0"

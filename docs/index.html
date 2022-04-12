@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Documentation Index</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Documentation</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="plot.html">plot</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+    <section class="readme-section">
+        <article><h1>nexrad-level-2-plot</h1>
+<blockquote>
+<p>A javascript implementation for plotting Nexrad Level II data parsed via <a href="https://github.com/netbymatt/nexrad-level-2-data/">nexrad-level-2-data</a>.</p>
+</blockquote>
+<h1>Use</h1>
+<h2>Install</h2>
+<pre class="prettyprint source lang-bash"><code>npm -i nexrad-level-2-plot
+</code></pre>
+<h2>Call</h2>
+<pre class="prettyprint source lang-javascript"><code>const fs = require('fs');
+const { plot, writeToPngFile } = require('nexrad-level-3-plot');
+
+// read a file
+const file = fs.readFileSync('&lt;path to data>');
+// parse and plot
+const level2Plot = plot(file, {elevation: 1, product: 'REF'});
+// use bundled utility to write to disk
+(async () => {
+	await writePngToFile('&lt;path to output>.png', level2Plot.REF.canvas);
+})();
+</code></pre>
+<h1>Data</h1>
+<p>Level two data is available from NOAA free of charge. <a href="https://github.com/netbymatt/nexrad-level-2-data/#background-information">nexrad-level-2-data</a> has additional details about these data sources.</p>
+<h1>Work in Progress</h1>
+<p>This package is currently incomplete. It will plot raster data created by the package mentioned above but there are several limitations that will be addressed in future releases.</p>
+<ul>
+<li>Color scales do not dynamically change when needed such as with total precipitation products.</li>
+<li>Only some products are <a href="#supported-products">supported</a></li>
+</ul>
+<h2>Supported Products</h2>
+<p>All products available as part of NEXRAD level 2 are listed. Currently supported products are marked.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Supported</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>REF</td>
+<td>[x]</td>
+<td>Reflectivity</td>
+</tr>
+<tr>
+<td>VEL</td>
+<td>[x]</td>
+<td>Velocity</td>
+</tr>
+<tr>
+<td>SW_</td>
+<td>[ ]</td>
+<td>Spectrum Width (note space after SW)</td>
+</tr>
+<tr>
+<td>ZDR</td>
+<td>[ ]</td>
+<td>Differential Reflectivity</td>
+</tr>
+<tr>
+<td>PHI</td>
+<td>[ ]</td>
+<td>Differential Phase Shift</td>
+</tr>
+<tr>
+<td>RHO</td>
+<td>[ ]</td>
+<td>Correlation Coefficient</td>
+</tr>
+</tbody>
+</table>
+<h1>Demos</h1>
+<p>Test code and data is provided in the <code>./demo</code> folder. <code>test.js</code> can be used to test any one of the products by commenting/uncommenting the appropriate line in the file. All images will be output as PNG to <code>./output</code>. A <code>test-all.js</code> is also provided to plot all of the products provided in the <code>./data/</code> folder. This test will produce images in multiple sizes to show scaling built-in scaling functionality. Some demo data contains errors. These errors are handled by the <a href="https://github.com/netbymatt/nexrad-level-2-data/">nexrad-level-2-data</a> and the response to the errors is detailed there</p>
+<h1>API</h1>
+<h2>plot(data, products, options)</h2>
+<p>Returns an array of objects. The order of elevations in the returned array matches the order of elevations in options.elevations</p>
+<pre class="prettyprint source lang-javascript"><code>	[
+		{
+			elevation: &lt;integer>,
+			REF: {
+				canvas: &lt;Canvas>,
+				palette: &lt;Uint8ClampedArray>
+			},
+			//... additional products
+		},
+	// ... additional elevations
+	]
+</code></pre>
+<p>The first level key in the returned object represents each requested product.</p>
+<blockquote>
+<p>Note: Each product may return false if no data was found for the specified elevation and product.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Paramater</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td>Level2Radar</td>
+<td></td>
+<td>Output from <a href="https://github.com/netbymatt/nexrad-level-2-data/">nexrad-level-2-data</a>.</td>
+</tr>
+<tr>
+<td>products</td>
+<td>Array of strings</td>
+<td>All</td>
+<td>Individual strings as shown in supported products to specify the products to be plotted.</td>
+</tr>
+<tr>
+<td>options.size</td>
+<td>integer</td>
+<td>3600</td>
+<td>1 to 3600. Size of the x and y axis in pixels. The image must be square so only a single integer is needed. See <a href="#downsampling">downsampling</a></td>
+</tr>
+<tr>
+<td>options.cropTo</td>
+<td>integer</td>
+<td>3600</td>
+<td>1 to 3600. After scaling and downsampling as described above crop the resulting plot to the size specified. Internally, the image is actually drawn at the cropped size to save on processing time.</td>
+</tr>
+<tr>
+<td>options.background</td>
+<td>string</td>
+<td>#000000</td>
+<td>Background color of the image. This can be transparent by using #RGBA notation. See <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle">ctx.fillStyle</a> for more information.</td>
+</tr>
+<tr>
+<td>options.lineWidth</td>
+<td>integer</td>
+<td>2</td>
+<td>The raster image is created by drawing several arcs at the locations and colors specified in the data file. When scaling down you may get a better looking image by adjusting this value to something large than the default.</td>
+</tr>
+<tr>
+<td>options.palettize</td>
+<td>boolean|object</td>
+<td>false</td>
+<td>After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used. Additional options are described in <a href="#palettizing">palettizing</a>. This can significantly reduce the size of the resulting image with minimal loss of clarity.</td>
+</tr>
+<tr>
+<td>options.elevations</td>
+<td>undefined|integer|Array of integers</td>
+<td>undefined</td>
+<td>The specific elevations to plot. If undefined (default) all available elevations will be plotted. If an integer is provided a single elevation will be plotted with all the selected <code>products</code>. If an array of integers are provided each <code>products</code> in each elevation will be plotted. Note that when a product and elevation combination do not exist the returned object will have false in the missing location. This is common where elevation 1 will have reflectivity data and elevation 2 (altough at the same angle as elevation 1) will contain velocity data.</td>
+</tr>
+<tr>
+<td>options.usePreferredWaveforms</td>
+<td>boolean</td>
+<td>true</td>
+<td>Waveform types of 1, 2, 3, 4 and 5 are produced by the radar. Type 1 is typically exclusive to reflectivity, Type 2 is typically exclusive to velocity however it also produces reflectivity data. Types 3, 4 and 5 all produce both velocity and reflectivity. When set to true type 1 waveforms will not plot velocity data, and type 2 waveforms will not plot reflectivity data. If you must see all information set this to false.</td>
+</tr>
+</tbody>
+</table>
+<h3>Downsampling</h3>
+<p>A full size plot is 3600 x 3600 pixels. This corresponds to the maximum range of the radar 460km (~250 mi) * maximum resolution 0.25 mi/bin * 2 (east and west side of radar).</p>
+<p>options.size &lt; 3600 will internally scale the image to the selected size. The scaling algorithm is specific to radar data and returns the maximum value over the range of bins that are combined due to the scaling factor. This ensures that maximum reflectivity or maximum velocity are preserved during the scaling process. Using an image scaling package is not preferred in this case as the scaling algorithm used my mask important data.</p>
+<p>options.size &gt; 3600 is invalid as this would cause data to be interpolated and would not be a true representation of the data returned by the radar. If you need this functionality it's recommended to use an image scaling package such as <a href="https://www.npmjs.com/package/jimp">jimp</a> or <a href="https://www.npmjs.com/package/gm">gm</a> on the Canvas returned by plot() which will also be much faster than the drawing methods used for a radar plot.</p>
+<h3>Palettizing</h3>
+<blockquote>
+<p>If used with <a href="#plotanddatafile-options">plotAndData()</a> both the original image and the palettized image will be returned if used with <a href="#plotfile-options">plot()</a> only the palettized image will be returned.</p>
+</blockquote>
+<p>Plotting what is essentially polar data (raw radar data) to a cartesean coordinate system (raster image) causes some artifacts as the arcs drawn by the raster data do not align exactly with the grid of pixels in the raster image. The plotting algorithm approximates the arc by using colors between the palette specificed color and background color to &quot;partially&quot; shade the pixels that are not fully consumed by the arc.</p>
+<p>This process makes use of the RGBA color space with either 3 or 4 bytes per pixel. From the standpoint of representing radar data in an image this is very inefficient use of space as typically 16 or 32 colors (&gt; 1 byte) is necessary to show the data in it's original format. This RGBA image also does not lend itself well to PNG compression which is lossless.</p>
+<p>Palettizing introduces a compromise between image size and compresability. After the initial image is drawn the palettizing algorithm can then re-process the RGBA image and force all pixels to be one of the original color values specificed in the product's palette (options.palettize = true, the default). It can also generate an optimized palette that uses a set number of steps between the colors in the palette and the background color with a maximum generated palette size of 256 colors (options.palettize.generate = <steps>). Finally a custom palette can be provided in the form of [r1,g1,b1,r2,g2,b2,...] alpha values will be generated automatically.</p>
+<p>A look-up table is created and cached as part of the palettization process speeding up additional calls the the palettizing function. The cache is specific to the product and options provided.</p>
+<h4>Palettization options (options.palettize.&lt;parameter&gt;)</h4>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>generate</td>
+<td>integer</td>
+<td>0</td>
+<td>Generate a palette by creating a number of steps between the background color and each color provided the the product data. There is a hard limit of 256 colors in the palette due to the PNG specification. For example a 16-color original palette with generate = 4 would produce a palette of 64 colors (4 versions of each of the original 16 colors).</td>
+</tr>
+<tr>
+<td>palette</td>
+<td>array</td>
+<td>&lt;from product&gt;</td>
+<td>If not provided the palette provided by the palette is used. If use the array should be in the format [r1,g1,b1,a1,r2,g2,b2,a2,...]. The generate option will operate on this array if it is provided. Set generate to 0 to keep the provided palette from being altered.</td>
+</tr>
+</tbody>
+</table>
+<h2>writePngToFile(fileName, data)</h2>
+<p>Returns a Promise which resolves to the written file name.
+Writes a PNG file to disk. Provided as a convenience function for production and testing.</p>
+<table>
+<thead>
+<tr>
+<th>Paramater</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fileName</td>
+<td>string</td>
+<td>A file name or path used by <a href="https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options">fs.createWriteStream()</a>.</td>
+</tr>
+<tr>
+<td>data</td>
+<td>{canvas[palette]}</td>
+<td>Typically the output of <a href="#plotfile-options">plot()</a>.&lt;product type&gt;.</td>
+</tr>
+</tbody>
+</table>
+<h1>Notable and breaking changes</h1>
+<h2>v2.0.0 Breaking, returns an array of objects</h2>
+<p>Previously, a single elevation would be plotted by the routine. The elevation was selected by <code>options.elevation</code>. <code>options.elevation</code> has been renamed to <code>options.elevations</code> and will still take a single integer as an input, but in this configuration an array is still returned. The simplest way to return to the functionality of v1.1.0 is <code>plot(data,products,{elevation: &lt;integer&gt;})[0]</code> which will return only the first object in the array.</p>
+<p><code>options.elevations</code> defaults to all the elevations in the provided file. This may not be the desired behavior, and will take significantly longer to plot if you do not need all of the data provided. You can query <code>data.listElevations()</code> to return an array of available elevations. The result can be passed directly to options.elevations or further processed to only select interesting elevations before calling <code>plot()</code>. Additional details of <code>options.elevations</code> are provided above.</p>
+<h2>v1.1.0 Notable, RRLE pre-processing</h2>
+<p>Testing and monitoring of this package in production showed that drawing each 0.5° or 1.0° arc as part of the plotting process was very time-expensive. Drawing a wider arc when adjacent radials had the same color at this position was significantly faster than drawing the two separate arcs.</p>
+<p>Implementing this solution which I am calling Radial Run Length Encoding, as it spans several radials, required significant reworking of the plotting engine and resulted in much more modular code. Four pre-process routines are now run on the radar data before plotting. The first three: Downsample, FilterProduct and IndexProduct were all part of the previous version but have been extracted from the main algorithm and placed into their own modules. After each of these three modules were implemented tests were run to show that the image generated was identical to v1.0.0. The addition of the rrle pre-processing module does change the output image slightly, but these visual changes are in the level of the artifacts that are inevitable due to the polar-to-raster conversion detailed in <a href="#palettizing">Palletizing</a>.</p>
+<h1>Acknowledgements</h1>
+<p>The code for this project is based upon:</p>
+<ul>
+<li><a href="https://github.com/Unidata/thredds/blob/master/cdm/src/main/java/ucar/nc2/iosp/nexrad2/">Unidata</a></li>
+<li><a href="https://github.com/bartholomew91/nexrad-radar-data">nexrad-radar-data</a></li>
+<li>And my own fork of the above <a href="https://github.com/netbymatt/nexrad-level-2-data">netbymatt/nexrad-level-2-data</a></li>
+</ul></article>
+    </section>
+
+
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a>
+	
+		on 2022-04-12T09:11:03-05:00
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

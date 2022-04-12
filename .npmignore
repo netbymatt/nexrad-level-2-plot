@@ -1,6 +1,7 @@
 .vscode
 data
 *.code-workspace
-test.js
-test*.js
+demos
+output
 .eslint*
+docs

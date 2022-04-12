@@ -6,7 +6,8 @@ module.exports = {
 		node: true,
 		jquery: true,
 	},
-	extends: 'airbnb-base',
+	plugins: ['jsdoc'],
+	extends: ['airbnb-base', 'plugin:import/recommended', 'plugin:jsdoc/recommended'],
 	globals: {
 		Atomics: 'readonly',
 		SharedArrayBuffer: 'readonly',
@@ -71,6 +72,13 @@ module.exports = {
 			allowAfterThis: true,
 		}],
 		'no-bitwise': 0,
+		'jsdoc/require-property-description': 0,
+		'jsdoc/require-returns-description': 0,
+		'jsdoc/no-undefined-types': 0,
+		// 'jsdoc/valid-types': 0,
+		'jsdoc/check-tag-names': ['error', {
+			definedTags: ['category'],
+		}],
 	},
 	ignorePatterns: [
 		'*.min.js',
