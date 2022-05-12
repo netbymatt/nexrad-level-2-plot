@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/netbymatt/nexrad-level-2-plot#readme",
   "dependencies": {
-    "canvas": "^2.8.0",
+    "canvas": "^2.9.1",
     "nexrad-level-2-data": "^2.1.0"
   },
   "devDependencies": {
