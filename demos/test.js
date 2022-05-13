@@ -46,7 +46,7 @@ if (single) {
 		const plots = plot(radarData, ['REF', 'VEL'], {
 			elevations,
 			size,
-			palettize: true,
+			palettize: false,
 			cropTo: size / 2,
 		});
 

@@ -1,4 +1,4 @@
-const canvasObj = require('canvas');
+const canvasObj = require('@napi-rs/canvas');
 
 const { createCanvas } = canvasObj;
 

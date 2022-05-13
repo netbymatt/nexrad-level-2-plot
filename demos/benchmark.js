@@ -30,7 +30,7 @@ const iterations = 10;
 	for (let i = 0; i < iterations; i += 1) {
 		const plots = plot(radarData, ['REF', 'VEL'], {
 			size,
-			palettize: true,
+			palettize: false,
 			cropTo: size / 2,
 		});
 

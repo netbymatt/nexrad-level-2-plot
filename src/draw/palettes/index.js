@@ -11,9 +11,11 @@ class Palette {
 		this.palette = palette.palette;
 		this.limits = palette.limits;
 		this.transparentIndex = palette.transparentIndex;
+		this.transparentValue = this.indexToValue(this.transparentIndex);
 		this.lookupRgba = findDbzRbgaGenerator(this.limits, this.palette, palette.maxDbzIndex);
 		this.lookupIndex = findDbzIndexGenerator(this.limits, this.palette, palette.maxDbzIndex);
-		this.closest = {};
+		this.closestIndexCache = {};
+		this.closestValueCache = {};
 
 		// these may not exist and are overridden with default functions
 		if (palette.hasOwnProperty('downSampleReset')) {
@@ -60,7 +62,7 @@ class Palette {
 		if (match[0] <= 2 && match[1] <= 2 && match[2] <= 2) return this.transparentIndex;
 		// short circuit previously calculated matches
 		const asHex = match[0].toString(16).padStart(2, '0') + match[1].toString(16).padStart(2, '0') + match[2].toString(16).padStart(2, '0');
-		if (this.closest[asHex]) return this.closest[asHex];
+		if (this.closestIndexCache[asHex]) return this.closestIndexCache[asHex];
 		// initial conditions
 		let closestIndex = 0;
 		let closest = Infinity;
@@ -75,8 +77,27 @@ class Palette {
 			}
 		}
 		// store closest match to speed up next iteration
-		this.closest[asHex] = closestIndex;
+		this.closestIndexCache[asHex] = closestIndex;
 		return closestIndex;
+	}
+
+	// match = [r,g,b[,a]]
+	closestValue(match) {
+		// short circuit for transparent (black)
+		if (match[0] <= 2 && match[1] <= 2 && match[2] <= 2) return this.transparentValue;
+		// short circuit previously calculated matches
+		const asHex = match[0].toString(16).padStart(2, '0') + match[1].toString(16).padStart(2, '0') + match[2].toString(16).padStart(2, '0');
+		if (this.closestValueCache[asHex]) return this.closestValueCache[asHex];
+		const closest = this.closestIndex(match);
+		const closestAsValue = this.indexToValue(closest);
+		this.closestValueCache[asHex] = closestAsValue;
+
+		return closestAsValue;
+	}
+
+	// index to value
+	indexToValue(index) {
+		return this.palette.slice(index * 4, index * 4 + 4);
 	}
 
 	// geometric distance
