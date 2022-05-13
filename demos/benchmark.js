@@ -22,11 +22,12 @@ files.forEach((file) => {
 const radarData = Level2Radar.combineData(chunks);
 
 const size = 1800;
+const iterations = 10;
 
 // plot for each elevation and size
 (async () => {
 	const start = new Date();
-	for (let i = 0; i < 100; i += 1) {
+	for (let i = 0; i < iterations; i += 1) {
 		const plots = plot(radarData, ['REF', 'VEL'], {
 			size,
 			palettize: true,
@@ -41,7 +42,8 @@ const size = 1800;
 			writePromises.push(writePngToFile(`./output/VEL-${elevation}-${size}.png`, p.VEL));
 		});
 		await Promise.allSettled(writePromises);
+
+		const end = new Date();
+		console.log(`Iteration: ${i + 1}/${iterations} Average time: ${(end - start) / 1000 / (i + 1)} s`);
 	}
-	const end = new Date();
-	console.log(`Total Time: ${(end - start) / 1000}`);
 })();
