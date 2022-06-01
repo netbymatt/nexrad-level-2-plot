@@ -73,6 +73,12 @@ const draw = (data, _options) => {
 	if (options.size < 1) throw new Error('Provide options.size > 0');
 	const scale = DEFAULT_OPTIONS.size / options.size;
 
+	// wsr88d uses a gate size of 0.25km, tdwr uses a gate size of 0.15km, although it is reported as 0.3km for processing reasons
+	// this calculation scales the plot accordingly to the nominal 0.25km so all generated plots are at the same scale
+	const rawGateSize = data?.data?.[options.elevation]?.[0]?.record?.reflect?.gate_size ?? 0.25;
+	const realGateSize = rawGateSize !== 0.3 ? rawGateSize : rawGateSize / 2;
+	const gateSizeScaling = 0.25 / realGateSize;
+
 	const longRange = data?.vcp?.record?.elevations?.[options.elevation]?.super_res_control?.super_res?.['300km'];
 	const rangeDivider = longRange ? 2 : 1;
 
@@ -90,7 +96,7 @@ const draw = (data, _options) => {
 
 	// canvas settings
 	ctx.imageSmoothingEnabled = true;
-	ctx.lineWidth = options.lineWidth * rangeDivider;
+	ctx.lineWidth = options.lineWidth * rangeDivider / gateSizeScaling;
 	ctx.translate(cropTo / 2, cropTo / 2);
 	ctx.rotate(-Math.PI / 2);
 
@@ -144,11 +150,11 @@ const draw = (data, _options) => {
 				if (bin.count) {
 					// rrle encoded
 					ctx.strokeStyle = palette.lookupRgba[bin.value];
-					ctx.arc(0, 0, (idx + deadZone) * rangeDivider, startAngle, endAngle + resolution * (bin.count - 1));
+					ctx.arc(0, 0, (idx + deadZone) * rangeDivider / gateSizeScaling, startAngle, endAngle + resolution * (bin.count - 1));
 				} else {
 					// plain data
 					ctx.strokeStyle = palette.lookupRgba[bin];
-					ctx.arc(0, 0, (idx + deadZone) * rangeDivider, startAngle, endAngle);
+					ctx.arc(0, 0, (idx + deadZone) * rangeDivider / gateSizeScaling, startAngle, endAngle);
 				}
 				ctx.stroke();
 			}
