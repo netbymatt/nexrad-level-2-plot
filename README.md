@@ -114,6 +114,9 @@ data|{canvas[palette]}|Typically the output of [plot()](#plotfile-options).\<pro
 
 # Notable and breaking changes
 
+## v2.5.0 Notable, 300km range now interperted correctly
+Prior to this version, if the data had the ```super_res_control.300km``` flag set the resulting image would effectively be "zoomed in by 2x". Upon examing the results of this flag on the plot, reference plots and the ```gate_count``` values it was determined no scaling needed to be performed if this flag was present. Instead, the ```gate_count``` already reflects the additional data the flag indicates. This mainly affects VEL plots and some REF plots at higher elevations, depending on the VCP the radar is using.
+
 ## v2.0.0 Breaking, returns an array of objects
 Previously, a single elevation would be plotted by the routine. The elevation was selected by ```options.elevation```. ```options.elevation``` has been renamed to ```options.elevations``` and will still take a single integer as an input, but in this configuration an array is still returned. The simplest way to return to the functionality of v1.1.0 is ```plot(data,products,{elevation: <integer>})[0]``` which will return only the first object in the array.
 

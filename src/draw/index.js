@@ -79,10 +79,12 @@ const draw = (data, _options) => {
 	const realGateSize = rawGateSize !== 0.3 ? rawGateSize : rawGateSize / 2;
 	const gateSizeScaling = 0.25 / realGateSize;
 
-	const longRange = data?.vcp?.record?.elevations?.[options.elevation]?.super_res_control?.super_res?.['300km'];
-	const rangeDivider = longRange ? 2 : 1;
-
 	// calculate crop, adjust if necessary
+	console.log('');
+	console.log(`ELEVATION: ${options.product} ${options.elevation}`);
+	console.log(`Gate size: ${data?.data?.[options.elevation]?.[0]?.record?.reflect?.gate_size}`);
+	console.log('Super Res:', data?.vcp?.record?.elevations?.[options.elevation]?.super_res_control?.super_res);
+	console.log(`Gate count: ${data?.data?.[options.elevation]?.[0]?.record?.reflect.gate_count}`);
 	const cropTo = Math.min(options.size, options.cropTo);
 	if (options.cropTo < 1) throw new Error('Provide options.cropTo > 0');
 
@@ -96,7 +98,7 @@ const draw = (data, _options) => {
 
 	// canvas settings
 	ctx.imageSmoothingEnabled = true;
-	ctx.lineWidth = options.lineWidth * rangeDivider / gateSizeScaling;
+	ctx.lineWidth = options.lineWidth / gateSizeScaling;
 	ctx.translate(cropTo / 2, cropTo / 2);
 	ctx.rotate(-Math.PI / 2);
 
@@ -150,11 +152,11 @@ const draw = (data, _options) => {
 				if (bin.count) {
 					// rrle encoded
 					ctx.strokeStyle = palette.lookupRgba[bin.value];
-					ctx.arc(0, 0, (idx + deadZone) * rangeDivider / gateSizeScaling, startAngle, endAngle + resolution * (bin.count - 1));
+					ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle + resolution * (bin.count - 1));
 				} else {
 					// plain data
 					ctx.strokeStyle = palette.lookupRgba[bin];
-					ctx.arc(0, 0, (idx + deadZone) * rangeDivider / gateSizeScaling, startAngle, endAngle);
+					ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle);
 				}
 				ctx.stroke();
 			}
