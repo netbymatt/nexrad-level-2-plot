@@ -80,11 +80,6 @@ const draw = (data, _options) => {
 	const gateSizeScaling = 0.25 / realGateSize;
 
 	// calculate crop, adjust if necessary
-	console.log('');
-	console.log(`ELEVATION: ${options.product} ${options.elevation}`);
-	console.log(`Gate size: ${data?.data?.[options.elevation]?.[0]?.record?.reflect?.gate_size}`);
-	console.log('Super Res:', data?.vcp?.record?.elevations?.[options.elevation]?.super_res_control?.super_res);
-	console.log(`Gate count: ${data?.data?.[options.elevation]?.[0]?.record?.reflect.gate_count}`);
 	const cropTo = Math.min(options.size, options.cropTo);
 	if (options.cropTo < 1) throw new Error('Provide options.cropTo > 0');
 
