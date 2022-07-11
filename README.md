@@ -16,10 +16,10 @@ const { plot, writeToPngFile } = require('nexrad-level-3-plot');
 // read a file
 const file = fs.readFileSync('<path to data>');
 // parse and plot
-const level2Plot = plot(file, {elevation: 1, product: 'REF'});
+const level2Plot = plot(file, 'REF', {elevations: 1});
 // use bundled utility to write to disk
 (async () => {
-	await writePngToFile('<path to output>.png', level2Plot.REF.canvas);
+	await writePngToFile('<path to output>.png', level2Plot[0].REF);
 })();
 ```
 # Data
@@ -56,7 +56,7 @@ Returns an array of objects. The order of elevations in the returned array match
 				canvas: <Canvas>,
 				palette: <Uint8ClampedArray>
 			},
-			//... additional products
+			// ... additional products
 		},
 	// ... additional elevations
 	]
