@@ -79,6 +79,9 @@ options.lineWidth|integer|2|The raster image is created by drawing several arcs 
 options.palettize|boolean\|object|false|After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used. Additional options are described in [palettizing](#palettizing). This can significantly reduce the size of the resulting image with minimal loss of clarity.
 options.elevations|undefined\|integer\|Array of integers|undefined|The specific elevations to plot. If undefined (default) all available elevations will be plotted. If an integer is provided a single elevation will be plotted with all the selected ```products```. If an array of integers are provided each ```products``` in each elevation will be plotted. Note that when a product and elevation combination do not exist the returned object will have false in the missing location. This is common where elevation 1 will have reflectivity data and elevation 2 (altough at the same angle as elevation 1) will contain velocity data.
 options.usePreferredWaveforms|boolean|true|Waveform types of 1, 2, 3, 4 and 5 are produced by the radar. Type 1 is typically exclusive to reflectivity, Type 2 is typically exclusive to velocity however it also produces reflectivity data. Types 3, 4 and 5 all produce both velocity and reflectivity. When set to true type 1 waveforms will not plot velocity data, and type 2 waveforms will not plot reflectivity data. If you must see all information set this to false.
+options.alpha|boolean|true|Draw on a 32-bit canvas. Passed directly to getContext('2d', {alpha}).
+options.imageSmoothingEnabled|boolean|true|Enable image smoothing. Passed directly to ctx.imageSmoothingEnabled.
+options.antialias|string|'default'|Enable antialias. Passed directly to ctx.antialias (part of node-canvas)
 
 ### Downsampling
 A full size plot is 3600 x 3600 pixels. This corresponds to the maximum range of the radar 460km (~250 mi) * maximum resolution 0.25 mi/bin * 2 (east and west side of radar).
@@ -113,6 +116,9 @@ fileName|string|A file name or path used by [fs.createWriteStream()](https://nod
 data|{canvas[palette]}|Typically the output of [plot()](#plotfile-options).\<product type>.
 
 # Notable and breaking changes
+
+## v2.6.0 Notable, Additional canvas configuration options
+The options antialias, imageSmoothingEnabled, and alpha were added and passed directly to the canvas context when creating it before plotting. Disabling these options (which were previously defaulted to on) can speed up plotting by about 5% and reduce output image size by up to 10% at a very slight cost of visual appearance.
 
 ## v2.5.0 Notable, 300km range now interperted correctly
 Prior to this version, if the data had the ```super_res_control.300km``` flag set the resulting image would effectively be "zoomed in by 2x". Upon examing the results of this flag on the plot, reference plots and the ```gate_count``` values it was determined no scaling needed to be performed if this flag was present. Instead, the ```gate_count``` already reflects the additional data the flag indicates. This mainly affects VEL plots and some REF plots at higher elevations, depending on the VCP the radar is using.

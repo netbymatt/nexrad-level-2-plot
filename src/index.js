@@ -12,6 +12,9 @@ const { writePngToFile } = require('./utils/file');
  * @param {(boolean|object)} [options.palettize] After drawing the image convert the image from RGBA to a palettized image. When true the same palette as the product is used.
  * @param {(undefined|number|number[])} [options.elevations=undefined] List of elevations to plot.
  * @param {boolean} [options.usePreferredWaveforms = true] Limit the plotted data to the preferred use of waveforms 1 and 2.
+ * @param {boolean} [options.alpha = true] Draw on a 32-bit canvas. Passed directly to getContext('2d', {alpha}).
+ * @param {boolean} [options.imageSmoothingEnabled = true] Control image smoothing. Passed directly to ctx.imageSmoothingEnabled.
+ * @param {string} [options.antialias = 'default'] Control antialias. Passed directly to ctx.antialias (part of node-canvas)
  * @returns Canvas
  */
 const plot = (data, _products, options) => {

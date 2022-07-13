@@ -51,6 +51,9 @@ const DEFAULT_OPTIONS = {
 	background: 'black',
 	lineWidth: 2,
 	usePreferredWaveforms: true,
+	alpha: true,
+	imageSmoothingEnabled: true,
+	antialias: 'default',
 };
 
 const draw = (data, _options) => {
@@ -85,7 +88,9 @@ const draw = (data, _options) => {
 
 	// create the canvas and context
 	const canvas = createCanvas(cropTo, cropTo);
-	const ctx = canvas.getContext('2d');
+	const ctx = canvas.getContext('2d', { alpha: options.alpha });
+	ctx.antialias = options.antialias;
+	ctx.imageSmoothingEnabled = options.imageSmoothingEnabled;
 
 	// fill background with black
 	ctx.fillStyle = options.background;
