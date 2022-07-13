@@ -4,8 +4,6 @@
 const findTotalMatches = (radials, startI, binIdx, resolutionThreshold) => {
 	// get the target value
 	const target = radials[startI].moment_data[binIdx];
-	// check for null
-	if (target === null) return false;
 
 	// start a counter for matches
 	let count = 1;
@@ -23,7 +21,7 @@ const findTotalMatches = (radials, startI, binIdx, resolutionThreshold) => {
 	// end condition is the number of radials available
 	// a radial not within the resolution threshold
 	// or the binIdx under test not present in one of the next radials
-	while (nextI < radials.length && checkNext) {
+	while (checkNext && nextI < radials.length) {
 		// reset flag
 		checkNext = false;
 		const nextAzimuth = radials[nextI].azimuth;
@@ -60,13 +58,14 @@ const rrle = (radials, resolutionRad) => {
 
 		// look at each bin on the radial
 		radial.moment_data.forEach((bin, binIdx) => {
+			if (radials[i].moment_data[binIdx] === null) return;
 			const totalMatches = findTotalMatches(radials, i, binIdx, resolutionThreshold);
 			// if a total match was found update the bin data and null out the remaining bins in the run
-			if (totalMatches) {
-				radial.moment_data[binIdx] = { value: bin, count: totalMatches };
-				for (let clearI = i + 1; clearI <= i + totalMatches - 1; clearI += 1) {
-					sorted[clearI].moment_data[binIdx] = null;
-				}
+			if (!totalMatches) return;
+			radial.moment_data[binIdx] = { value: bin, count: totalMatches };
+			const loopEnd = i + totalMatches - 1;
+			for (let clearI = i + 1; clearI <= loopEnd; clearI += 1) {
+				sorted[clearI].moment_data[binIdx] = null;
 			}
 		});
 	}

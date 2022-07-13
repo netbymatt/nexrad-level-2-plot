@@ -146,20 +146,20 @@ const draw = (data, _options) => {
 
 		// plot each bin
 		radial.moment_data.forEach((bin, idx) => {
-			if (bin !== null) {
-				ctx.beginPath();
-				// different methods for rrle encoded or not
-				if (bin.count) {
-					// rrle encoded
-					ctx.strokeStyle = palette.lookupRgba[bin.value];
-					ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle + resolution * (bin.count - 1));
-				} else {
-					// plain data
-					ctx.strokeStyle = palette.lookupRgba[bin];
-					ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle);
-				}
-				ctx.stroke();
+			if (bin === null) return;
+
+			ctx.beginPath();
+			// different methods for rrle encoded or not
+			if (bin.count) {
+				// rrle encoded
+				ctx.strokeStyle = palette.lookupRgba[bin.value];
+				ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle + resolution * (bin.count - 1));
+			} else {
+				// plain data
+				ctx.strokeStyle = palette.lookupRgba[bin];
+				ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle);
 			}
+			ctx.stroke();
 		});
 	});
 
@@ -171,7 +171,7 @@ const draw = (data, _options) => {
 	}
 
 	// palettize image
-	const palettized = palettizeImage(canvas.getContext('2d'), palette);
+	const palettized = palettizeImage(ctx, palette);
 
 	// return palettized image
 	return {

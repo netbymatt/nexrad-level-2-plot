@@ -22,7 +22,7 @@ files.forEach((file) => {
 const radarData = Level2Radar.combineData(chunks);
 
 const size = 1800;
-const iterations = 10;
+const iterations = 5;
 
 // plot for each elevation and size
 (async () => {
@@ -32,6 +32,9 @@ const iterations = 10;
 			size,
 			palettize: true,
 			cropTo: size / 2,
+			alpha: false,
+			imageSmoothingEnabled: false,
+			antialias: 'none',
 		});
 
 		// write files to disk
