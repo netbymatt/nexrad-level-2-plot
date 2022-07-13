@@ -4,6 +4,8 @@
 // this ensures that the colors are not blended because the index should be returned in the a position
 // after the entire image is drawn the index information must be shifted from g to a
 
+const hexLookup = require('./hexlookup');
+
 const rgbaLookupSize = 200;
 
 class Palette {
@@ -59,7 +61,8 @@ class Palette {
 		// short circuit for transparent (black)
 		if (match[0] <= 2 && match[1] <= 2 && match[2] <= 2) return this.transparentIndex;
 		// short circuit previously calculated matches
-		const asHex = match[0].toString(16).padStart(2, '0') + match[1].toString(16).padStart(2, '0') + match[2].toString(16).padStart(2, '0');
+		const asHex = hexLookup[match[0]] + hexLookup[match[1]] + hexLookup[match[2]];
+		// const asHex = match[0].toString(16).padStart(2, '0') + match[1].toString(16).padStart(2, '0') + match[2].toString(16).padStart(2, '0');
 		if (this.closest[asHex]) return this.closest[asHex];
 		// initial conditions
 		let closestIndex = 0;
@@ -80,6 +83,7 @@ class Palette {
 	}
 
 	// geometric distance
+	// square root is intentionally not taken for performance reasons
 	static geometricDistance(a, b) {
 		return a.reduce((acc, val, idx) => acc + (val - b[idx]) ** 2, 0);
 	}
