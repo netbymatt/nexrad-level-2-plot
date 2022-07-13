@@ -39,7 +39,7 @@ const iterations = 5;
 
 		// write files to disk
 		const writePromises = [];
-		plots.forEach((p) => {
+		(await plots).forEach((p) => {
 			const { elevation } = p;
 			writePromises.push(writePngToFile(`./output/REF-${elevation}-${size}.png`, p.REF));
 			writePromises.push(writePngToFile(`./output/VEL-${elevation}-${size}.png`, p.VEL));

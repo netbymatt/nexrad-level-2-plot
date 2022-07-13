@@ -1,5 +1,12 @@
+const { StaticPool } = require('node-worker-threads-pool');
 const { draw, canvas } = require('./draw');
 const { writePngToFile } = require('./utils/file');
+
+const staticPool = new StaticPool({
+	size: 16,
+	task: draw,
+});
+
 /**
  * Plot level 2 data
  * @param {Level2Data} data output from the nexrad-level-2-data library
@@ -17,10 +24,7 @@ const { writePngToFile } = require('./utils/file');
  * @param {string} [options.antialias = 'default'] Control antialias. Passed directly to ctx.antialias (part of node-canvas)
  * @returns Canvas
  */
-const plot = (data, _products, options) => {
-	// store result
-	const result = [];
-
+const plot = async (data, _products, options) => {
 	let products;
 	// make product list into an array
 	if (_products && Array.isArray(_products)) {
@@ -41,18 +45,18 @@ const plot = (data, _products, options) => {
 	if (!elevations) elevations = availableElevations;
 	if (typeof elevations === 'number') elevations = [elevations];
 
-	elevations.forEach((elevation) => {
+	const result = await Promise.all(elevations.map(async (elevation) => {
 		const elevationResult = { elevation };
-		products.forEach((product) => {
+		await Promise.all(products.map(async (product) => {
 			// parse and store result
-			elevationResult[product] = draw(data, {
+			elevationResult[product] = await staticPool.exec(data.data, {
 				...options,
 				elevation,
 				product,
 			});
-		});
-		result.push(elevationResult);
-	});
+		}));
+		return elevationResult;
+	}));
 
 	return result;
 };
