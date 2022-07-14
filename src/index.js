@@ -1,5 +1,6 @@
-const { StaticPool } = require('node-worker-threads-pool');
-const { draw, canvas } = require('./draw');
+const { Piscina } = require('piscina');
+const path = require('path');
+const { canvas } = require('./draw');
 const { writePngToFile } = require('./utils/file');
 
 /**
@@ -40,17 +41,16 @@ const plot = async (data, _products, options) => {
 	if (!elevations) elevations = availableElevations;
 	if (typeof elevations === 'number') elevations = [elevations];
 
-	const staticPool = new StaticPool({
-		size: 3,
-		task: function drawTask(...args) { console.log('running thread'); draw(this.workerData, ...args); },
-		workerData: data.data,
+	const staticPool = new Piscina({
+		filename: path.resolve(__dirname, './draw/thread.js'),
+		workerData: data.toObject(),
 	});
 
 	const result = await Promise.all(elevations.map(async (elevation) => {
 		const elevationResult = { elevation };
 		await Promise.all(products.map(async (product) => {
 			// parse and store result
-			elevationResult[product] = await staticPool.exec({
+			elevationResult[product] = await staticPool.run({
 				...options,
 				elevation,
 				product,
