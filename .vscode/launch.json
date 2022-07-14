@@ -11,7 +11,8 @@
 			"skipFiles": [
 				"<node_internals>/**"
 			],
-			"program": "${workspaceFolder}/demos/test.js"
+			"program": "${workspaceFolder}/demos/test.js",
+			"outputCapture": "std",
 		},
 		{
 			"type": "pwa-node",

@@ -43,10 +43,11 @@ if (single) {
 // plot for each elevation and size
 (async () => {
 	await Promise.allSettled(sizes.map(async (size) => {
-		const plots = plot(radarData, ['REF', 'VEL'], {
+		const plots = await plot(radarData, ['REF', 'VEL'], {
 			elevations,
 			size,
 			palettize: true,
+			elevations: 1,
 			cropTo: size / 2,
 		});
 
