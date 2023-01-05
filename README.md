@@ -2,6 +2,9 @@
 
 > A javascript implementation for plotting Nexrad Level II data parsed via [nexrad-level-2-data](https://github.com/netbymatt/nexrad-level-2-data/).
 
+# Demo
+A live demo showing the output of this library (via [nexrad-level-2-data](https://www.github.com/netbymatt/nexrad-level-2-data)) for select radar sites is available at https://nexrad-demo.netbymatt.com/
+
 # Use
 ## Install
 ```bash
