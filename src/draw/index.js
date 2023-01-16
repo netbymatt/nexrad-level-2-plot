@@ -76,11 +76,10 @@ const draw = (data, _options) => {
 	if (options.size < 1) throw new Error('Provide options.size > 0');
 	const scale = DEFAULT_OPTIONS.size / options.size;
 
-	// wsr88d uses a gate size of 0.25km, tdwr uses a gate size of 0.15km, although it is reported as 0.3km for processing reasons
+	// wsr88d uses a gate size of 0.25km, tdwr uses a gate size of 0.15km or 0.30km
 	// this calculation scales the plot accordingly to the nominal 0.25km so all generated plots are at the same scale
 	const rawGateSize = data?.data?.[options.elevation]?.[0]?.record?.reflect?.gate_size ?? 0.25;
-	const realGateSize = rawGateSize !== 0.3 ? rawGateSize : rawGateSize / 2;
-	const gateSizeScaling = 0.25 / realGateSize;
+	const gateSizeScaling = rawGateSize / 0.25;
 
 	// calculate crop, adjust if necessary
 	const cropTo = Math.min(options.size, options.cropTo);
