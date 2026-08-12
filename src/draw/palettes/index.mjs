@@ -57,20 +57,20 @@ class Palette {
 		return `rgba(${this.palette[index * 4]},${this.palette[index * 4 + 1]},${this.palette[index * 4 + 2]},${this.palette[(index * 4 + 3)] / 255})`;
 	}
 
-	// match = [r,g,b[,a]]
-	closestIndex(match) {
+	// r,g,b = individual color components, passed separately to avoid allocating
+	// a temporary array for every pixel (this is called once per output pixel)
+	closestIndex(r, g, b) {
 		// short circuit for transparent (black)
-		if (match[0] <= 2 && match[1] <= 2 && match[2] <= 2) return this.transparentIndex;
+		if (r <= 2 && g <= 2 && b <= 2) return this.transparentIndex;
 		// short circuit previously calculated matches
-		const asHex = hexLookup[match[0]] + hexLookup[match[1]] + hexLookup[match[2]];
-		// const asHex = match[0].toString(16).padStart(2, '0') + match[1].toString(16).padStart(2, '0') + match[2].toString(16).padStart(2, '0');
+		const asHex = hexLookup[r] + hexLookup[g] + hexLookup[b];
 		if (this.closest[asHex]) return this.closest[asHex];
 		// initial conditions
 		let closestIndex = 0;
 		let closest = Infinity;
 		// loop through array
 		for (let i = 0; i < this.palette.length; i += 4) {
-			const dist = Palette.geometricDistance(match, this.palette.slice(i, i + match.length));
+			const dist = Palette.geometricDistance(r, g, b, this.palette[i], this.palette[i + 1], this.palette[i + 2]);
 			// test for closer
 			if (dist < closest) {
 				closest = dist;
@@ -85,8 +85,8 @@ class Palette {
 
 	// geometric distance
 	// square root is intentionally not taken for performance reasons
-	static geometricDistance(a, b) {
-		return a.reduce((acc, val, idx) => acc + (val - b[idx]) ** 2, 0);
+	static geometricDistance(r1, g1, b1, r2, g2, b2) {
+		return (r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2;
 	}
 }
 

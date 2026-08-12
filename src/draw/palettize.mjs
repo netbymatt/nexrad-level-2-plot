@@ -13,14 +13,17 @@ const palettizeImage = (sourceCtx, palette) => {
 	const indexedCtx = indexedCanvas.getContext('2d', { pixelFormat: 'A8' });
 
 	// get the source image data
-	const sourceImageData = sourceCtx.getImageData(0, 0, dim.x, dim.y);
+	const { data: sourceData } = sourceCtx.getImageData(0, 0, dim.x, dim.y);
 	// get the indexed image data (destination)
 	const indexedImageData = indexedCtx.getImageData(0, 0, dim.x, dim.y);
+	const { data: indexedData } = indexedImageData;
 
 	// loop through each pixel
-	indexedImageData.data.forEach((val, idx) => {
-		indexedImageData.data[idx] = palette.closestIndex(sourceImageData.data.slice(idx * 4, idx * 4 + 3));
-	});
+	// (a plain for loop indexing directly into the source data avoids allocating
+	// a new typed array per pixel, which a .slice()-based approach would require)
+	for (let idx = 0, srcIdx = 0; idx < indexedData.length; idx += 1, srcIdx += 4) {
+		indexedData[idx] = palette.closestIndex(sourceData[srcIdx], sourceData[srcIdx + 1], sourceData[srcIdx + 2]);
+	}
 
 	// write the new image data
 	indexedCtx.putImageData(indexedImageData, 0, 0);
