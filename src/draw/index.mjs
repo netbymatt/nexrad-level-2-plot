@@ -138,6 +138,21 @@ const draw = (data, _options) => {
 	const rrlEncoded = rrle(indexedProduct, resolution);
 
 	// loop through data
+	// bins are drawn in the same order as before (radials in azimuth order, then
+	// range bins outward) but a stroke() + beginPath() pair is only expensive to
+	// issue once per arc, and most of that cost is fixed overhead independent of
+	// arc size. so instead of stroking every single bin individually, consecutive
+	// bins that share the same color are accumulated into one path and painted
+	// with a single stroke() call. this never reorders anything relative to the
+	// original drawing sequence, it just defers the stroke() until the color is
+	// about to change (or the data runs out), so the result is unaffected other
+	// than by output speed.
+	let openStrokeStyle = null;
+	const flushStroke = () => {
+		if (openStrokeStyle === null) return;
+		ctx.stroke();
+	};
+
 	rrlEncoded.forEach((radial) => {
 		// calculate plotting parameters
 		const deadZone = radial.first_gate / radial.gate_size / scale;
@@ -150,20 +165,38 @@ const draw = (data, _options) => {
 		radial.moment_data.forEach((bin, idx) => {
 			if (bin === null) return;
 
-			ctx.beginPath();
 			// different methods for rrle encoded or not
+			let color;
+			let arcEndAngle;
 			if (bin.count) {
 				// rrle encoded
-				ctx.strokeStyle = palette.lookupRgba[bin.value];
-				ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle + resolution * (bin.count - 1));
+				color = palette.lookupRgba[bin.value];
+				arcEndAngle = endAngle + resolution * (bin.count - 1);
 			} else {
 				// plain data
-				ctx.strokeStyle = palette.lookupRgba[bin];
-				ctx.arc(0, 0, (idx + deadZone) * gateSizeScaling, startAngle, endAngle);
+				color = palette.lookupRgba[bin];
+				arcEndAngle = endAngle;
 			}
-			ctx.stroke();
+
+			// paint and close out the prior path whenever the color changes, since a
+			// single stroke() call can only use one strokeStyle
+			if (color !== openStrokeStyle) {
+				flushStroke();
+				ctx.beginPath();
+				ctx.strokeStyle = color;
+				openStrokeStyle = color;
+			}
+
+			const radius = (idx + deadZone) * gateSizeScaling;
+			// moveTo to the arc's start point first so this arc becomes its own
+			// subpath rather than getting connected to the previous arc by a
+			// straight line (canvas connects consecutive arc() calls otherwise)
+			ctx.moveTo(radius * Math.cos(startAngle), radius * Math.sin(startAngle));
+			ctx.arc(0, 0, radius, startAngle, arcEndAngle);
 		});
 	});
+	// paint whatever is left in the final open path
+	flushStroke();
 
 	if (!options.palettize) {
 	// return the palette and canvas
