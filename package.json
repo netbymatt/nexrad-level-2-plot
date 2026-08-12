@@ -4,7 +4,8 @@
 	"description": "Plotting library for nexrad-level-2-data",
 	"main": "src/index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"lint": "npx eslint .",
+		"lint:fix": "npx eslint . --fix"
 	},
 	"repository": {
 		"type": "git",
@@ -28,12 +29,13 @@
 		"nexrad-level-2-data": "file:../nexrad-level-2-data"
 	},
 	"devDependencies": {
-		"eslint": "^8.0.0",
-		"eslint-config-airbnb-base": "^15.0.0",
-		"eslint-plugin-import": "^2.23.4",
-		"glob": "^10.0.0"
+		"@eslint/compat": "^2.1.0",
+		"@eslint/js": "^9.39.5",
+		"eslint": "^9.39.5",
+		"eslint-config-airbnb-extended": "^3.1.1",
+		"glob": "^13.0.6"
 	},
 	"engines": {
-		"node": ">=13.0.0"
+		"node": ">=24.0.0"
 	}
 }
