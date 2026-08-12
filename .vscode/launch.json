@@ -5,22 +5,22 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"type": "pwa-node",
+			"type": "node",
 			"request": "launch",
 			"name": "Test",
 			"skipFiles": [
 				"<node_internals>/**"
 			],
-			"program": "${workspaceFolder}/demos/test.js"
+			"program": "${workspaceFolder}/demos/test.mjs"
 		},
 		{
-			"type": "pwa-node",
+			"type": "node",
 			"request": "launch",
 			"name": "Benchmark",
 			"skipFiles": [
 				"<node_internals>/**"
 			],
-			"program": "${workspaceFolder}/demos/benchmark.js"
+			"program": "${workspaceFolder}/demos/benchmark.mjs"
 		}
 	]
 }

@@ -1,5 +1,6 @@
-const { draw, canvas } = require('./draw');
-const { writePngToFile } = require('./utils/file');
+import { draw, canvas } from './draw/index.mjs';
+import writePngToFile from './utils/writePngToFile.mjs';
+
 /**
  * Plot level 2 data
  * @param {Level2Data} data output from the nexrad-level-2-data library
@@ -57,7 +58,9 @@ const plot = (data, _products, options) => {
 	return result;
 };
 
-module.exports = {
+export default plot;
+
+export {
 	plot,
 	writePngToFile,
 	canvas,

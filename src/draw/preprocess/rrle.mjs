@@ -46,7 +46,7 @@ const findTotalMatches = (radials, startI, binIdx, resolutionThreshold) => {
 
 const rrle = (radials, resolutionRad) => {
 	// calculate the nominal angle to the next radial plus 20% to easily account for floating point inaccuracies
-	const resolutionThreshold = resolutionRad * 180 / Math.PI * 1.2;
+	const resolutionThreshold = ((resolutionRad * 180) / Math.PI) * 1.2;
 	// sort the radials by azimuth, 0 > 360
 	const sorted = radials.sort((a, b) => a.azimuth - b.azimuth);
 
@@ -73,4 +73,4 @@ const rrle = (radials, resolutionRad) => {
 	return radials;
 };
 
-module.exports = rrle;
+export default rrle;

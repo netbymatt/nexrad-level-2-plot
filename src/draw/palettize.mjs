@@ -1,4 +1,4 @@
-const { createCanvas } = require('canvas');
+import { createCanvas } from 'canvas';
 
 const palettizeImage = (sourceCtx, palette) => {
 	// get the dimensions of the image from the ctx
@@ -28,4 +28,4 @@ const palettizeImage = (sourceCtx, palette) => {
 	return indexedCanvas;
 };
 
-module.exports = palettizeImage;
+export default palettizeImage;

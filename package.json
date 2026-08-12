@@ -3,6 +3,7 @@
 	"version": "2.6.4",
 	"description": "Plotting library for nexrad-level-2-data",
 	"main": "src/index.js",
+	"type": "module",
 	"scripts": {
 		"lint": "npx eslint .",
 		"lint:fix": "npx eslint . --fix"

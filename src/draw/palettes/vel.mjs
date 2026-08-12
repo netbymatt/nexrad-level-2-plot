@@ -41,7 +41,7 @@ const downSample = (cur, prev) => {
 	return prev;
 };
 
-const limits = 	[-99, -90, -80, -70, -60, -50, -40, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 99,
+const limits = [-99, -90, -80, -70, -60, -50, -40, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 99,
 ];
 
 const downSampleReset = null;
@@ -50,7 +50,7 @@ const maxDbzIndex = 12; // index of maximum dbz
 
 const transparentIndex = 24;
 
-module.exports = {
+export {
 	palette,
 	downSample,
 	limits,

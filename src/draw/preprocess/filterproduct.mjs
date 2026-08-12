@@ -13,4 +13,4 @@ const filterProduct = (data, product) => data.map((header) => {
 	// remove any missing radials
 }).filter((d) => d);
 
-module.exports = filterProduct;
+export default filterProduct;

@@ -13,4 +13,4 @@ const indexProduct = (radials, palette) => radials.map((radial) => {
 	};
 });
 
-module.exports = indexProduct;
+export default indexProduct;

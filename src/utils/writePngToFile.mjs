@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'node:fs';
 // write a canvas to a Png file
 /**
  * Write a Canvas to the specified file
@@ -26,6 +26,4 @@ const writePngToFile = (fileName, data) => new Promise((resolve, reject) => {
 	writeStream.on('error', (e) => reject(e));
 });
 
-module.exports = {
-	writePngToFile,
-};
+export default writePngToFile;

@@ -2,7 +2,7 @@
 // this includes "cropping" the data to the specified size
 
 // calculation constants
-const RAD45 = (45 * Math.PI / 180);
+const RAD45 = (45 * Math.PI) / 180;
 const RAD90 = RAD45 * 2;
 
 const downSample = (radials, scale, resolution, options, palette) => {
@@ -25,7 +25,7 @@ const downSample = (radials, scale, resolution, options, palette) => {
 		const azWrap = (((azimuth - RAD45) % RAD90) + RAD90) % RAD90;
 		// calculate a magnitude multiplier as 1/sin with 45° shift removed
 		const azMagnitudeMult = 1 / Math.abs(Math.sin(azWrap + RAD45));
-		const cropMaxBin = Math.ceil(Math.abs(options.cropTo / 2 * scale * azMagnitudeMult));
+		const cropMaxBin = Math.ceil(Math.abs((options.cropTo / 2) * scale * azMagnitudeMult));
 
 		// compare max calculated value with length of radial
 		const maxBin = Math.min(cropMaxBin, radial.moment_data.length);
@@ -53,4 +53,4 @@ const downSample = (radials, scale, resolution, options, palette) => {
 	});
 };
 
-module.exports = downSample;
+export default downSample;

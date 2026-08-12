@@ -1,15 +1,19 @@
-const canvasObj = require('canvas');
+import canvasObj from 'canvas';
 
-const { createCanvas } = canvasObj;
+import Palette from './palettes/index.mjs';
 
-const Palette = require('./palettes');
-const palettizeImage = require('./palettize');
+import palettizeImage from './palettize.mjs';
 
 // data pre-processing
-const filterProduct = require('./preprocess/filterproduct');
-const downSample = require('./preprocess/downsample');
-const indexProduct = require('./preprocess/indexproduct');
-const rrle = require('./preprocess/rrle');
+import filterProduct from './preprocess/filterproduct.mjs';
+import downSample from './preprocess/downsample.mjs';
+import indexProduct from './preprocess/indexproduct.mjs';
+import rrle from './preprocess/rrle.mjs';
+
+import * as ref from './palettes/ref.mjs';
+import * as vel from './palettes/vel.mjs';
+
+const { createCanvas } = canvasObj;
 
 // names of data structures keyed to product name
 const dataNames = {
@@ -28,12 +32,11 @@ const dataFunctions = {
 };
 
 // generate all palettes
-/* eslint-disable global-require */
+
 const palettes = {
-	REF: new Palette(require('./palettes/ref')),
-	VEL: new Palette(require('./palettes/vel')),
+	REF: new Palette(ref),
+	VEL: new Palette(vel),
 };
-/* eslint-enable global-require */
 
 const preferredWaveformUsage = {
 	1: ['REF', 'SW ', 'ZDR', 'PHI', 'RHO'],
@@ -96,7 +99,7 @@ const draw = (data, _options) => {
 	ctx.fillRect(0, 0, cropTo, cropTo);
 
 	// canvas settings
-	ctx.imageSmoothingEnabled = true;
+	// ctx.imageSmoothingEnabled = true;
 	ctx.lineWidth = options.lineWidth / gateSizeScaling;
 	ctx.translate(cropTo / 2, cropTo / 2);
 	ctx.rotate(-Math.PI / 2);
@@ -179,8 +182,10 @@ const draw = (data, _options) => {
 	};
 };
 
-module.exports = {
+const canvas = canvasObj;
+
+export {
 	draw,
 	DEFAULT_OPTIONS,
-	canvas: canvasObj,
+	canvas,
 };
