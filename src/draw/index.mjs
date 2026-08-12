@@ -162,38 +162,42 @@ const draw = (data, _options) => {
 		const endAngle = radial.azimuth * (Math.PI / 180) + halfResolution * 1.1;
 
 		// plot each bin
-		radial.moment_data.forEach((bin, idx) => {
-			if (bin === null) return;
+		// (a plain for loop avoids per-bin callback-invocation overhead - this runs
+		// up to ~radials x gates times per elevation/product)
+		const { moment_data: momentData } = radial;
+		for (let idx = 0; idx < momentData.length; idx += 1) {
+			const bin = momentData[idx];
+			if (bin !== null) {
+				// different methods for rrle encoded or not
+				let color;
+				let arcEndAngle;
+				if (bin.count) {
+					// rrle encoded
+					color = palette.lookupRgba[bin.value];
+					arcEndAngle = endAngle + resolution * (bin.count - 1);
+				} else {
+					// plain data
+					color = palette.lookupRgba[bin];
+					arcEndAngle = endAngle;
+				}
 
-			// different methods for rrle encoded or not
-			let color;
-			let arcEndAngle;
-			if (bin.count) {
-				// rrle encoded
-				color = palette.lookupRgba[bin.value];
-				arcEndAngle = endAngle + resolution * (bin.count - 1);
-			} else {
-				// plain data
-				color = palette.lookupRgba[bin];
-				arcEndAngle = endAngle;
+				// paint and close out the prior path whenever the color changes, since a
+				// single stroke() call can only use one strokeStyle
+				if (color !== openStrokeStyle) {
+					flushStroke();
+					ctx.beginPath();
+					ctx.strokeStyle = color;
+					openStrokeStyle = color;
+				}
+
+				const radius = (idx + deadZone) * gateSizeScaling;
+				// moveTo to the arc's start point first so this arc becomes its own
+				// subpath rather than getting connected to the previous arc by a
+				// straight line (canvas connects consecutive arc() calls otherwise)
+				ctx.moveTo(radius * Math.cos(startAngle), radius * Math.sin(startAngle));
+				ctx.arc(0, 0, radius, startAngle, arcEndAngle);
 			}
-
-			// paint and close out the prior path whenever the color changes, since a
-			// single stroke() call can only use one strokeStyle
-			if (color !== openStrokeStyle) {
-				flushStroke();
-				ctx.beginPath();
-				ctx.strokeStyle = color;
-				openStrokeStyle = color;
-			}
-
-			const radius = (idx + deadZone) * gateSizeScaling;
-			// moveTo to the arc's start point first so this arc becomes its own
-			// subpath rather than getting connected to the previous arc by a
-			// straight line (canvas connects consecutive arc() calls otherwise)
-			ctx.moveTo(radius * Math.cos(startAngle), radius * Math.sin(startAngle));
-			ctx.arc(0, 0, radius, startAngle, arcEndAngle);
-		});
+		}
 	});
 	// paint whatever is left in the final open path
 	flushStroke();
