@@ -27,7 +27,7 @@
 	"homepage": "https://github.com/netbymatt/nexrad-level-2-plot#readme",
 	"dependencies": {
 		"canvas": "^3.0.0",
-		"nexrad-level-2-data": "file:../nexrad-level-2-data"
+		"nexrad-level-2-data": "^3.0.0"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.1.0",
