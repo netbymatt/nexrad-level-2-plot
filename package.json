@@ -2,7 +2,7 @@
 	"name": "nexrad-level-2-plot",
 	"version": "3.0.1",
 	"description": "Plotting library for nexrad-level-2-data",
-	"main": "src/index.js",
+	"main": "src/index.mjs",
 	"type": "module",
 	"scripts": {
 		"lint": "npx eslint .",
