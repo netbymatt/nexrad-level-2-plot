@@ -12,6 +12,7 @@ import rrle from './preprocess/rrle.mjs';
 
 import * as ref from './palettes/ref.mjs';
 import * as vel from './palettes/vel.mjs';
+import * as rho from './palettes/rho.mjs';
 
 const { createCanvas } = canvasObj;
 
@@ -22,13 +23,14 @@ const dataNames = {
 	'SW ': 'spectrum',	// intentional space to fill 3-character requirement
 	ZDR: 'zdr',
 	PHI: 'phi',
-	RHO: 'rho',
+	RHO: 'rho',	// correlation coefficient
 };
 
 // names of data retrieval routines keyed to product name
 const dataFunctions = {
 	REF: 'getHighresReflectivity',
 	VEL: 'getHighresVelocity',
+	RHO: 'getHighresCorrelation',
 };
 
 // generate all palettes
@@ -36,6 +38,7 @@ const dataFunctions = {
 const palettes = {
 	REF: new Palette(ref),
 	VEL: new Palette(vel),
+	RHO: new Palette(rho),
 };
 
 const preferredWaveformUsage = {
