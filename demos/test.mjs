@@ -11,11 +11,11 @@ import { plot, writePngToFile } from '../src/index.mjs';
 // const files = glob.sync('./data/KLOT/34/*');
 // const files = glob.sync('./data/KLOT/381/*');
 // const files = glob.sync('./data/KLOT/548/*');
-const files = await glob.sync('./data/KLOT/940/*');
+// const files = await glob.sync('./data/KLOT/940/*');
 // const files = glob.sync('./data/KSRX/804/*');
 // const files = glob.sync('./data/TORD/168/*');
 // const files = glob.sync('./data/KLOT/KLOT20210812_171451_V*');	// ref palette tuning
-// const files = glob.sync('./data/KLOT/KLOT20210621_041151_V06');	// vel palette tuning
+const files = glob.sync('./data/KLOT/KLOT20210621_041151_V06');	// vel palette tuning
 
 // const store each file's data
 const chunks = [];
@@ -33,7 +33,7 @@ const radarData = Level2Radar.combineData(chunks);
 // default to all plots unless single is specificed
 const single = process.argv.includes('single');
 
-let sizes = [1800];
+let sizes = [3200];
 let elevations = radarData.listElevations();
 if (single) {
 	sizes = sizes.slice(0, 1);
@@ -46,7 +46,7 @@ if (single) {
 // plot for each elevation and size
 console.time('processing');
 await Promise.allSettled(sizes.map(async (size) => {
-	const plots = plot(radarData, ['REF', 'VEL'], {
+	const plots = plot(radarData, ['REF', 'VEL', 'RHO'], {
 		elevations,
 		size,
 		palettize: true,
@@ -61,6 +61,7 @@ await Promise.allSettled(sizes.map(async (size) => {
 		const { elevation } = p;
 		writePromises.push(writePngToFile(`./output/REF-${elevation}-${size}.png`, p.REF));
 		writePromises.push(writePngToFile(`./output/VEL-${elevation}-${size}.png`, p.VEL));
+		writePromises.push(writePngToFile(`./output/RHO-${elevation}-${size}.png`, p.RHO));
 	});
 	await Promise.allSettled(writePromises);
 }));
